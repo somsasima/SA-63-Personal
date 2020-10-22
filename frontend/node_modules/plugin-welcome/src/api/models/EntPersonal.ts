@@ -33,6 +33,12 @@ export interface EntPersonal {
      */
     added?: string;
     /**
+     * PersonalDob holds the value of the "PersonalDob" field.
+     * @type {string}
+     * @memberof EntPersonal
+     */
+    personalDob?: string;
+    /**
      * PersonalMail holds the value of the "PersonalMail" field.
      * @type {string}
      * @memberof EntPersonal
@@ -75,6 +81,7 @@ export function EntPersonalFromJSONTyped(json: any, ignoreDiscriminator: boolean
     return {
         
         'added': !exists(json, 'Added') ? undefined : json['Added'],
+        'personalDob': !exists(json, 'PersonalDob') ? undefined : json['PersonalDob'],
         'personalMail': !exists(json, 'PersonalMail') ? undefined : json['PersonalMail'],
         'personalName': !exists(json, 'PersonalName') ? undefined : json['PersonalName'],
         'personalPhone': !exists(json, 'PersonalPhone') ? undefined : json['PersonalPhone'],
@@ -93,6 +100,7 @@ export function EntPersonalToJSON(value?: EntPersonal | null): any {
     return {
         
         'Added': value.added,
+        'PersonalDob': value.personalDob,
         'PersonalMail': value.personalMail,
         'PersonalName': value.personalName,
         'PersonalPhone': value.personalPhone,

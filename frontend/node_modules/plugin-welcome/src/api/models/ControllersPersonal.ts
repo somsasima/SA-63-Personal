@@ -42,6 +42,12 @@ export interface ControllersPersonal {
      * @type {string}
      * @memberof ControllersPersonal
      */
+    personalDob?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ControllersPersonal
+     */
     personalMail?: string;
     /**
      * 
@@ -82,6 +88,7 @@ export function ControllersPersonalFromJSONTyped(json: any, ignoreDiscriminator:
         'added': !exists(json, 'added') ? undefined : json['added'],
         'department': !exists(json, 'department') ? undefined : json['department'],
         'jobtitle': !exists(json, 'jobtitle') ? undefined : json['jobtitle'],
+        'personalDob': !exists(json, 'personalDob') ? undefined : json['personalDob'],
         'personalMail': !exists(json, 'personalMail') ? undefined : json['personalMail'],
         'personalName': !exists(json, 'personalName') ? undefined : json['personalName'],
         'personalPhone': !exists(json, 'personalPhone') ? undefined : json['personalPhone'],
@@ -102,6 +109,7 @@ export function ControllersPersonalToJSON(value?: ControllersPersonal | null): a
         'added': value.added,
         'department': value.department,
         'jobtitle': value.jobtitle,
+        'personalDob': value.personalDob,
         'personalMail': value.personalMail,
         'personalName': value.personalName,
         'personalPhone': value.personalPhone,

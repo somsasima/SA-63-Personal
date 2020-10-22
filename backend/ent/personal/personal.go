@@ -17,6 +17,8 @@ const (
 	FieldPersonalMail = "personal_mail"
 	// FieldPersonalPhone holds the string denoting the personalphone field in the database.
 	FieldPersonalPhone = "personal_phone"
+	// FieldPersonalDob holds the string denoting the personaldob field in the database.
+	FieldPersonalDob = "personal_dob"
 	// FieldAdded holds the string denoting the added field in the database.
 	FieldAdded = "added"
 
@@ -58,6 +60,7 @@ var Columns = []string{
 	FieldPersonalName,
 	FieldPersonalMail,
 	FieldPersonalPhone,
+	FieldPersonalDob,
 	FieldAdded,
 }
 

@@ -87,6 +87,7 @@ export default function ComponentsTable() {
            <TableCell align="center">Name</TableCell>
            <TableCell align="center">Mail</TableCell>
            <TableCell align="center">Phone</TableCell>
+           <TableCell align="center">DOB</TableCell>
            <TableCell align="center">Jobtitle</TableCell>
            <TableCell align="center">Department</TableCell>
            <TableCell align="center">Systemmember</TableCell>
@@ -102,6 +103,7 @@ export default function ComponentsTable() {
              <TableCell align="center">{item.personalName}</TableCell>
              <TableCell align="center">{item.personalMail}</TableCell>
              <TableCell align="center">{item.personalPhone}</TableCell>
+             <TableCell align="center">{item.personalDob}</TableCell>
              <TableCell align="center">{item.edges?.jobtitle?.jobtitlename}</TableCell>
              <TableCell align="center">{item.edges?.department?.departmentname}</TableCell>
              <TableCell align="center">{item.edges?.systemmember?.id}</TableCell>

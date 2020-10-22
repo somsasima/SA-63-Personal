@@ -599,6 +599,9 @@ var doc = `{
                 "jobtitle": {
                     "type": "integer"
                 },
+                "personalDob": {
+                    "type": "string"
+                },
                 "personalMail": {
                     "type": "string"
                 },
@@ -692,6 +695,10 @@ var doc = `{
             "properties": {
                 "Added": {
                     "description": "Added holds the value of the \"Added\" field.",
+                    "type": "string"
+                },
+                "PersonalDob": {
+                    "description": "PersonalDob holds the value of the \"PersonalDob\" field.",
                     "type": "string"
                 },
                 "PersonalMail": {

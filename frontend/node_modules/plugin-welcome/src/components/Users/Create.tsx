@@ -80,6 +80,7 @@ export default function CreateUser() {
   const [personalName, setPersonalName] = useState(String);
   const [personalMail, setPersonalMail] = useState(String);
   const [personalPhone, setPersonalPhone] = useState(String);
+  const [personalDob, setPersonalDob] = useState(String);
 
 
   useEffect(() => {
@@ -118,6 +119,10 @@ export default function CreateUser() {
     setAdded(event.target.value as string);
   };
 
+  const handlePersonalDobChange = (event: any) => {
+    setPersonalDob(event.target.value as string);
+  };
+
   const handlePersonalNameChange = (event: any) => {
     setPersonalName(event.target.value as string);
   };
@@ -149,6 +154,7 @@ const CreatePersonal = async () => {
     personalName : personalName,
     personalMail : personalMail,
     personalPhone : personalPhone,
+    personalDob : personalDob,
     added : added +  ":00+07:00",
     jobtitle : jobtitle,
     department : department,
@@ -249,6 +255,25 @@ return (
               onChange={handlePersonalPhoneChange}
             />
 
+            <div className={classes.paper}><strong>วันเกิด</strong></div>
+            <TextField className={classes.textField}
+            //style={{ width: 500 ,marginLeft:7,marginRight:-7}}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <CalendarTodayIcon />
+                </InputAdornment>
+              ),
+            }}
+              id="personalDob"
+              label=""
+              variant="standard"
+              color="secondary"
+              type="date"
+              size="medium"
+              value={personalDob}
+              onChange={handlePersonalDobChange}
+            />
 
             <div className={classes.paper}><strong>สายงาน</strong></div>
             <Select className={classes.select}

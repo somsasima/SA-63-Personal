@@ -114,6 +114,13 @@ func PersonalPhone(v string) predicate.Personal {
 	})
 }
 
+// PersonalDob applies equality check predicate on the "PersonalDob" field. It's identical to PersonalDobEQ.
+func PersonalDob(v string) predicate.Personal {
+	return predicate.Personal(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPersonalDob), v))
+	})
+}
+
 // Added applies equality check predicate on the "Added" field. It's identical to AddedEQ.
 func Added(v time.Time) predicate.Personal {
 	return predicate.Personal(func(s *sql.Selector) {
@@ -451,6 +458,117 @@ func PersonalPhoneEqualFold(v string) predicate.Personal {
 func PersonalPhoneContainsFold(v string) predicate.Personal {
 	return predicate.Personal(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldPersonalPhone), v))
+	})
+}
+
+// PersonalDobEQ applies the EQ predicate on the "PersonalDob" field.
+func PersonalDobEQ(v string) predicate.Personal {
+	return predicate.Personal(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPersonalDob), v))
+	})
+}
+
+// PersonalDobNEQ applies the NEQ predicate on the "PersonalDob" field.
+func PersonalDobNEQ(v string) predicate.Personal {
+	return predicate.Personal(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldPersonalDob), v))
+	})
+}
+
+// PersonalDobIn applies the In predicate on the "PersonalDob" field.
+func PersonalDobIn(vs ...string) predicate.Personal {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Personal(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldPersonalDob), v...))
+	})
+}
+
+// PersonalDobNotIn applies the NotIn predicate on the "PersonalDob" field.
+func PersonalDobNotIn(vs ...string) predicate.Personal {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Personal(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldPersonalDob), v...))
+	})
+}
+
+// PersonalDobGT applies the GT predicate on the "PersonalDob" field.
+func PersonalDobGT(v string) predicate.Personal {
+	return predicate.Personal(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldPersonalDob), v))
+	})
+}
+
+// PersonalDobGTE applies the GTE predicate on the "PersonalDob" field.
+func PersonalDobGTE(v string) predicate.Personal {
+	return predicate.Personal(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldPersonalDob), v))
+	})
+}
+
+// PersonalDobLT applies the LT predicate on the "PersonalDob" field.
+func PersonalDobLT(v string) predicate.Personal {
+	return predicate.Personal(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldPersonalDob), v))
+	})
+}
+
+// PersonalDobLTE applies the LTE predicate on the "PersonalDob" field.
+func PersonalDobLTE(v string) predicate.Personal {
+	return predicate.Personal(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldPersonalDob), v))
+	})
+}
+
+// PersonalDobContains applies the Contains predicate on the "PersonalDob" field.
+func PersonalDobContains(v string) predicate.Personal {
+	return predicate.Personal(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldPersonalDob), v))
+	})
+}
+
+// PersonalDobHasPrefix applies the HasPrefix predicate on the "PersonalDob" field.
+func PersonalDobHasPrefix(v string) predicate.Personal {
+	return predicate.Personal(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldPersonalDob), v))
+	})
+}
+
+// PersonalDobHasSuffix applies the HasSuffix predicate on the "PersonalDob" field.
+func PersonalDobHasSuffix(v string) predicate.Personal {
+	return predicate.Personal(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldPersonalDob), v))
+	})
+}
+
+// PersonalDobEqualFold applies the EqualFold predicate on the "PersonalDob" field.
+func PersonalDobEqualFold(v string) predicate.Personal {
+	return predicate.Personal(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldPersonalDob), v))
+	})
+}
+
+// PersonalDobContainsFold applies the ContainsFold predicate on the "PersonalDob" field.
+func PersonalDobContainsFold(v string) predicate.Personal {
+	return predicate.Personal(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldPersonalDob), v))
 	})
 }
 

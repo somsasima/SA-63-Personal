@@ -41,6 +41,12 @@ func (pc *PersonalCreate) SetPersonalPhone(s string) *PersonalCreate {
 	return pc
 }
 
+// SetPersonalDob sets the PersonalDob field.
+func (pc *PersonalCreate) SetPersonalDob(s string) *PersonalCreate {
+	pc.mutation.SetPersonalDob(s)
+	return pc
+}
+
 // SetAdded sets the Added field.
 func (pc *PersonalCreate) SetAdded(t time.Time) *PersonalCreate {
 	pc.mutation.SetAdded(t)
@@ -127,6 +133,9 @@ func (pc *PersonalCreate) Save(ctx context.Context) (*Personal, error) {
 	}
 	if _, ok := pc.mutation.PersonalPhone(); !ok {
 		return nil, &ValidationError{Name: "PersonalPhone", err: errors.New("ent: missing required field \"PersonalPhone\"")}
+	}
+	if _, ok := pc.mutation.PersonalDob(); !ok {
+		return nil, &ValidationError{Name: "PersonalDob", err: errors.New("ent: missing required field \"PersonalDob\"")}
 	}
 	if _, ok := pc.mutation.Added(); !ok {
 		v := personal.DefaultAdded()
@@ -215,6 +224,14 @@ func (pc *PersonalCreate) createSpec() (*Personal, *sqlgraph.CreateSpec) {
 			Column: personal.FieldPersonalPhone,
 		})
 		pe.PersonalPhone = value
+	}
+	if value, ok := pc.mutation.PersonalDob(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: personal.FieldPersonalDob,
+		})
+		pe.PersonalDob = value
 	}
 	if value, ok := pc.mutation.Added(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

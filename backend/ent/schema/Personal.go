@@ -19,6 +19,7 @@ func (Personal) Fields() []ent.Field {
 		field.String("PersonalName"),
 		field.String("PersonalMail"),
 		field.String("PersonalPhone"),
+		field.String("PersonalDob"),
 		field.Time("Added").Default(time.Now),
 	}
 }

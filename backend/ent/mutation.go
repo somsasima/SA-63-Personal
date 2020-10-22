@@ -777,6 +777,7 @@ type PersonalMutation struct {
 	_PersonalName       *string
 	_PersonalMail       *string
 	_PersonalPhone      *string
+	_PersonalDob        *string
 	_Added              *time.Time
 	clearedFields       map[string]struct{}
 	jobtitle            *int
@@ -979,6 +980,43 @@ func (m *PersonalMutation) ResetPersonalPhone() {
 	m._PersonalPhone = nil
 }
 
+// SetPersonalDob sets the PersonalDob field.
+func (m *PersonalMutation) SetPersonalDob(s string) {
+	m._PersonalDob = &s
+}
+
+// PersonalDob returns the PersonalDob value in the mutation.
+func (m *PersonalMutation) PersonalDob() (r string, exists bool) {
+	v := m._PersonalDob
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPersonalDob returns the old PersonalDob value of the Personal.
+// If the Personal object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *PersonalMutation) OldPersonalDob(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldPersonalDob is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldPersonalDob requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPersonalDob: %w", err)
+	}
+	return oldValue.PersonalDob, nil
+}
+
+// ResetPersonalDob reset all changes of the "PersonalDob" field.
+func (m *PersonalMutation) ResetPersonalDob() {
+	m._PersonalDob = nil
+}
+
 // SetAdded sets the Added field.
 func (m *PersonalMutation) SetAdded(t time.Time) {
 	m._Added = &t
@@ -1147,7 +1185,7 @@ func (m *PersonalMutation) Type() string {
 // this mutation. Note that, in order to get all numeric
 // fields that were in/decremented, call AddedFields().
 func (m *PersonalMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m._PersonalName != nil {
 		fields = append(fields, personal.FieldPersonalName)
 	}
@@ -1156,6 +1194,9 @@ func (m *PersonalMutation) Fields() []string {
 	}
 	if m._PersonalPhone != nil {
 		fields = append(fields, personal.FieldPersonalPhone)
+	}
+	if m._PersonalDob != nil {
+		fields = append(fields, personal.FieldPersonalDob)
 	}
 	if m._Added != nil {
 		fields = append(fields, personal.FieldAdded)
@@ -1174,6 +1215,8 @@ func (m *PersonalMutation) Field(name string) (ent.Value, bool) {
 		return m.PersonalMail()
 	case personal.FieldPersonalPhone:
 		return m.PersonalPhone()
+	case personal.FieldPersonalDob:
+		return m.PersonalDob()
 	case personal.FieldAdded:
 		return m.Added()
 	}
@@ -1191,6 +1234,8 @@ func (m *PersonalMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldPersonalMail(ctx)
 	case personal.FieldPersonalPhone:
 		return m.OldPersonalPhone(ctx)
+	case personal.FieldPersonalDob:
+		return m.OldPersonalDob(ctx)
 	case personal.FieldAdded:
 		return m.OldAdded(ctx)
 	}
@@ -1222,6 +1267,13 @@ func (m *PersonalMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPersonalPhone(v)
+		return nil
+	case personal.FieldPersonalDob:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPersonalDob(v)
 		return nil
 	case personal.FieldAdded:
 		v, ok := value.(time.Time)
@@ -1288,6 +1340,9 @@ func (m *PersonalMutation) ResetField(name string) error {
 		return nil
 	case personal.FieldPersonalPhone:
 		m.ResetPersonalPhone()
+		return nil
+	case personal.FieldPersonalDob:
+		m.ResetPersonalDob()
 		return nil
 	case personal.FieldAdded:
 		m.ResetAdded()

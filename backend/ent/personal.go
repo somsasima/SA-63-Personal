@@ -25,6 +25,8 @@ type Personal struct {
 	PersonalMail string `json:"PersonalMail,omitempty"`
 	// PersonalPhone holds the value of the "PersonalPhone" field.
 	PersonalPhone string `json:"PersonalPhone,omitempty"`
+	// PersonalDob holds the value of the "PersonalDob" field.
+	PersonalDob string `json:"PersonalDob,omitempty"`
 	// Added holds the value of the "Added" field.
 	Added time.Time `json:"Added,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -97,6 +99,7 @@ func (*Personal) scanValues() []interface{} {
 		&sql.NullString{}, // PersonalName
 		&sql.NullString{}, // PersonalMail
 		&sql.NullString{}, // PersonalPhone
+		&sql.NullString{}, // PersonalDob
 		&sql.NullTime{},   // Added
 	}
 }
@@ -137,12 +140,17 @@ func (pe *Personal) assignValues(values ...interface{}) error {
 	} else if value.Valid {
 		pe.PersonalPhone = value.String
 	}
-	if value, ok := values[3].(*sql.NullTime); !ok {
-		return fmt.Errorf("unexpected type %T for field Added", values[3])
+	if value, ok := values[3].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field PersonalDob", values[3])
+	} else if value.Valid {
+		pe.PersonalDob = value.String
+	}
+	if value, ok := values[4].(*sql.NullTime); !ok {
+		return fmt.Errorf("unexpected type %T for field Added", values[4])
 	} else if value.Valid {
 		pe.Added = value.Time
 	}
-	values = values[4:]
+	values = values[5:]
 	if len(values) == len(personal.ForeignKeys) {
 		if value, ok := values[0].(*sql.NullInt64); !ok {
 			return fmt.Errorf("unexpected type %T for edge-field department_id", value)
@@ -210,6 +218,8 @@ func (pe *Personal) String() string {
 	builder.WriteString(pe.PersonalMail)
 	builder.WriteString(", PersonalPhone=")
 	builder.WriteString(pe.PersonalPhone)
+	builder.WriteString(", PersonalDob=")
+	builder.WriteString(pe.PersonalDob)
 	builder.WriteString(", Added=")
 	builder.WriteString(pe.Added.Format(time.ANSIC))
 	builder.WriteByte(')')

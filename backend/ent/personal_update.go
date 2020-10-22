@@ -49,6 +49,12 @@ func (pu *PersonalUpdate) SetPersonalPhone(s string) *PersonalUpdate {
 	return pu
 }
 
+// SetPersonalDob sets the PersonalDob field.
+func (pu *PersonalUpdate) SetPersonalDob(s string) *PersonalUpdate {
+	pu.mutation.SetPersonalDob(s)
+	return pu
+}
+
 // SetAdded sets the Added field.
 func (pu *PersonalUpdate) SetAdded(t time.Time) *PersonalUpdate {
 	pu.mutation.SetAdded(t)
@@ -234,6 +240,13 @@ func (pu *PersonalUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: personal.FieldPersonalPhone,
 		})
 	}
+	if value, ok := pu.mutation.PersonalDob(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: personal.FieldPersonalDob,
+		})
+	}
 	if value, ok := pu.mutation.Added(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -379,6 +392,12 @@ func (puo *PersonalUpdateOne) SetPersonalMail(s string) *PersonalUpdateOne {
 // SetPersonalPhone sets the PersonalPhone field.
 func (puo *PersonalUpdateOne) SetPersonalPhone(s string) *PersonalUpdateOne {
 	puo.mutation.SetPersonalPhone(s)
+	return puo
+}
+
+// SetPersonalDob sets the PersonalDob field.
+func (puo *PersonalUpdateOne) SetPersonalDob(s string) *PersonalUpdateOne {
+	puo.mutation.SetPersonalDob(s)
 	return puo
 }
 
@@ -563,6 +582,13 @@ func (puo *PersonalUpdateOne) sqlSave(ctx context.Context) (pe *Personal, err er
 			Type:   field.TypeString,
 			Value:  value,
 			Column: personal.FieldPersonalPhone,
+		})
+	}
+	if value, ok := puo.mutation.PersonalDob(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: personal.FieldPersonalDob,
 		})
 	}
 	if value, ok := puo.mutation.Added(); ok {

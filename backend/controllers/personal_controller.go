@@ -22,6 +22,7 @@ type Personal struct {
 	PersonalName  string
 	PersonalMail  string
 	PersonalPhone string
+	PersonalDob   string
 	Added         string
 	Jobtitle      int
 	Department    int
@@ -91,6 +92,7 @@ func (ctl *PersonalController) CreatePersonal(c *gin.Context) {
 		SetPersonalName(obj.PersonalName).
 		SetPersonalMail(obj.PersonalMail).
 		SetPersonalPhone(obj.PersonalPhone).
+		SetPersonalDob(obj.PersonalDob).
 		SetJobtitle(jt).
 		SetDepartment(d).
 		SetSystemmember(sm).

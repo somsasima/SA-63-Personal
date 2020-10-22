@@ -38,6 +38,7 @@ var (
 		{Name: "personal_name", Type: field.TypeString},
 		{Name: "personal_mail", Type: field.TypeString},
 		{Name: "personal_phone", Type: field.TypeString},
+		{Name: "personal_dob", Type: field.TypeString},
 		{Name: "added", Type: field.TypeTime},
 		{Name: "department_id", Type: field.TypeInt, Nullable: true},
 		{Name: "jobtitle_id", Type: field.TypeInt, Nullable: true},
@@ -51,21 +52,21 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:  "personals_departments_personal",
-				Columns: []*schema.Column{PersonalsColumns[5]},
+				Columns: []*schema.Column{PersonalsColumns[6]},
 
 				RefColumns: []*schema.Column{DepartmentsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:  "personals_jobtitles_personal",
-				Columns: []*schema.Column{PersonalsColumns[6]},
+				Columns: []*schema.Column{PersonalsColumns[7]},
 
 				RefColumns: []*schema.Column{JobtitlesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:  "personals_systemmembers_personal",
-				Columns: []*schema.Column{PersonalsColumns[7]},
+				Columns: []*schema.Column{PersonalsColumns[8]},
 
 				RefColumns: []*schema.Column{SystemmembersColumns[0]},
 				OnDelete:   schema.SetNull,

@@ -16,7 +16,7 @@ func init() {
 	personalFields := schema.Personal{}.Fields()
 	_ = personalFields
 	// personalDescAdded is the schema descriptor for Added field.
-	personalDescAdded := personalFields[3].Descriptor()
+	personalDescAdded := personalFields[4].Descriptor()
 	// personal.DefaultAdded holds the default value on creation for the Added field.
 	personal.DefaultAdded = personalDescAdded.Default.(func() time.Time)
 }
