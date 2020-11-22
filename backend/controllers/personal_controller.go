@@ -4,13 +4,12 @@ import (
 	"context"
 	"fmt"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ssaatw/app/ent"
 	"github.com/ssaatw/app/ent/department"
+	"github.com/ssaatw/app/ent/gender"
 	"github.com/ssaatw/app/ent/jobtitle"
-	"github.com/ssaatw/app/ent/systemmember"
 )
 
 type PersonalController struct {
@@ -19,15 +18,10 @@ type PersonalController struct {
 }
 
 type Personal struct {
-	PersonalName  string
-	PersonalMail  string
-	PersonalPhone string
-	PersonalDob   string
-	Added         string
-	Jobtitle      int
-	Department    int
-	Systemmember  int
-	Personaldata  int
+	PersonalName string
+	Jobtitle     int
+	Department   int
+	Gender       int
 }
 
 // CreatePersonal handles POST requests for adding personal entities
@@ -74,29 +68,24 @@ func (ctl *PersonalController) CreatePersonal(c *gin.Context) {
 		return
 	}
 
-	sm, err := ctl.client.Systemmember.
+	g, err := ctl.client.Gender.
 		Query().
-		Where(systemmember.IDEQ(int(obj.Systemmember))).
+		Where(gender.IDEQ(int(obj.Gender))).
 		Only(context.Background())
 
 	if err != nil {
 		c.JSON(400, gin.H{
-			"error": "systemmember not found",
+			"error": "gender not found",
 		})
 		return
 	}
 
-	a, err := time.Parse(time.RFC3339, obj.Added)
 	p, err := ctl.client.Personal.
 		Create().
 		SetPersonalName(obj.PersonalName).
-		SetPersonalMail(obj.PersonalMail).
-		SetPersonalPhone(obj.PersonalPhone).
-		SetPersonalDob(obj.PersonalDob).
 		SetJobtitle(jt).
 		SetDepartment(d).
-		SetSystemmember(sm).
-		SetAdded(a).
+		SetGender(g).
 		Save(context.Background())
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -175,7 +164,7 @@ func (ctl *PersonalController) ListPersonal(c *gin.Context) {
 		Query().
 		WithJobtitle().
 		WithDepartment().
-		WithSystemmember().
+		WithGender().
 		Limit(limit).
 		Offset(offset).
 		All(context.Background())

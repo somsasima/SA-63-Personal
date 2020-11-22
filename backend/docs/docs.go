@@ -167,6 +167,140 @@ var doc = `{
                 }
             }
         },
+        "/genders": {
+            "get": {
+                "description": "list gender entities",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "List gender entities",
+                "operationId": "list-gender",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ent.Gender"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create gender",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create gender",
+                "operationId": "create-gender",
+                "parameters": [
+                    {
+                        "description": "Gender entity",
+                        "name": "gender",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.Gender"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.Gender"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/genders/{id}": {
+            "get": {
+                "description": "get gender by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get a gender entity by ID",
+                "operationId": "get-gender",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Gender ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ent.Gender"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
         "/jobtitles": {
             "get": {
                 "description": "list jobtitle entities",
@@ -434,140 +568,6 @@ var doc = `{
                     }
                 }
             }
-        },
-        "/systemmembers": {
-            "get": {
-                "description": "list systemmember entities",
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "List systemmember entities",
-                "operationId": "list-systemmember",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Limit",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Offset",
-                        "name": "offset",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/ent.Systemmember"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/gin.H"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/gin.H"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create systemmember",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Create systemmember",
-                "operationId": "create-systemmember",
-                "parameters": [
-                    {
-                        "description": "Systemmember entity",
-                        "name": "systemmember",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/controllers.Systemmember"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.Systemmember"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/gin.H"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/gin.H"
-                        }
-                    }
-                }
-            }
-        },
-        "/systemmembers/{id}": {
-            "get": {
-                "description": "get systemmember by ID",
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Get a systemmember entity by ID",
-                "operationId": "get-systemmember",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Systemmember ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/ent.Systemmember"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/gin.H"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/gin.H"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/gin.H"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -575,6 +575,14 @@ var doc = `{
             "type": "object",
             "properties": {
                 "departmentname": {
+                    "type": "string"
+                }
+            }
+        },
+        "controllers.Gender": {
+            "type": "object",
+            "properties": {
+                "gendername": {
                     "type": "string"
                 }
             }
@@ -590,42 +598,16 @@ var doc = `{
         "controllers.Personal": {
             "type": "object",
             "properties": {
-                "added": {
-                    "type": "string"
-                },
                 "department": {
+                    "type": "integer"
+                },
+                "gender": {
                     "type": "integer"
                 },
                 "jobtitle": {
                     "type": "integer"
                 },
-                "personalDob": {
-                    "type": "string"
-                },
-                "personalMail": {
-                    "type": "string"
-                },
                 "personalName": {
-                    "type": "string"
-                },
-                "personalPhone": {
-                    "type": "string"
-                },
-                "personaldata": {
-                    "type": "integer"
-                },
-                "systemmember": {
-                    "type": "integer"
-                }
-            }
-        },
-        "controllers.Systemmember": {
-            "type": "object",
-            "properties": {
-                "mail": {
-                    "type": "string"
-                },
-                "password": {
                     "type": "string"
                 }
             }
@@ -649,6 +631,36 @@ var doc = `{
             }
         },
         "ent.DepartmentEdges": {
+            "type": "object",
+            "properties": {
+                "personal": {
+                    "description": "Personal holds the value of the personal edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.Personal"
+                    }
+                }
+            }
+        },
+        "ent.Gender": {
+            "type": "object",
+            "properties": {
+                "Gendername": {
+                    "description": "Gendername holds the value of the \"Gendername\" field.",
+                    "type": "string"
+                },
+                "edges": {
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the GenderQuery when eager-loading is set.",
+                    "type": "object",
+                    "$ref": "#/definitions/ent.GenderEdges"
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                }
+            }
+        },
+        "ent.GenderEdges": {
             "type": "object",
             "properties": {
                 "personal": {
@@ -693,24 +705,8 @@ var doc = `{
         "ent.Personal": {
             "type": "object",
             "properties": {
-                "Added": {
-                    "description": "Added holds the value of the \"Added\" field.",
-                    "type": "string"
-                },
-                "PersonalDob": {
-                    "description": "PersonalDob holds the value of the \"PersonalDob\" field.",
-                    "type": "string"
-                },
-                "PersonalMail": {
-                    "description": "PersonalMail holds the value of the \"PersonalMail\" field.",
-                    "type": "string"
-                },
                 "PersonalName": {
                     "description": "PersonalName holds the value of the \"PersonalName\" field.",
-                    "type": "string"
-                },
-                "PersonalPhone": {
-                    "description": "PersonalPhone holds the value of the \"PersonalPhone\" field.",
                     "type": "string"
                 },
                 "edges": {
@@ -732,49 +728,15 @@ var doc = `{
                     "type": "object",
                     "$ref": "#/definitions/ent.Department"
                 },
+                "gender": {
+                    "description": "Gender holds the value of the gender edge.",
+                    "type": "object",
+                    "$ref": "#/definitions/ent.Gender"
+                },
                 "jobtitle": {
                     "description": "Jobtitle holds the value of the jobtitle edge.",
                     "type": "object",
                     "$ref": "#/definitions/ent.Jobtitle"
-                },
-                "systemmember": {
-                    "description": "Systemmember holds the value of the systemmember edge.",
-                    "type": "object",
-                    "$ref": "#/definitions/ent.Systemmember"
-                }
-            }
-        },
-        "ent.Systemmember": {
-            "type": "object",
-            "properties": {
-                "Mail": {
-                    "description": "Mail holds the value of the \"Mail\" field.",
-                    "type": "string"
-                },
-                "Password": {
-                    "description": "Password holds the value of the \"Password\" field.",
-                    "type": "string"
-                },
-                "edges": {
-                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the SystemmemberQuery when eager-loading is set.",
-                    "type": "object",
-                    "$ref": "#/definitions/ent.SystemmemberEdges"
-                },
-                "id": {
-                    "description": "ID of the ent.",
-                    "type": "integer"
-                }
-            }
-        },
-        "ent.SystemmemberEdges": {
-            "type": "object",
-            "properties": {
-                "personal": {
-                    "description": "Personal holds the value of the personal edge.",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/ent.Personal"
-                    }
                 }
             }
         },
@@ -787,10 +749,12 @@ var doc = `{
         "ApiKeyAuth": {
             "type": "apiKey",
             "name": "Authorization",
-            "in": "header"
+            "in": "header",
+            "authorizationUrl": ""
         },
         "BasicAuth": {
-            "type": "basic"
+            "type": "basic",
+            "authorizationUrl": ""
         },
         "OAuth2AccessCode": {
             "type": "oauth2",
@@ -804,6 +768,7 @@ var doc = `{
         "OAuth2Application": {
             "type": "oauth2",
             "flow": "application",
+            "authorizationUrl": "",
             "tokenUrl": "https://example.com/oauth/token",
             "scopes": {
                 "admin": " Grants read and write access to administrative information",
@@ -822,6 +787,7 @@ var doc = `{
         "OAuth2Password": {
             "type": "oauth2",
             "flow": "password",
+            "authorizationUrl": "",
             "tokenUrl": "https://example.com/oauth/token",
             "scopes": {
                 "admin": " Grants read and write access to administrative information",

@@ -5,13 +5,12 @@ package ent
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/facebookincubator/ent/dialect/sql"
 	"github.com/ssaatw/app/ent/department"
+	"github.com/ssaatw/app/ent/gender"
 	"github.com/ssaatw/app/ent/jobtitle"
 	"github.com/ssaatw/app/ent/personal"
-	"github.com/ssaatw/app/ent/systemmember"
 )
 
 // Personal is the model entity for the Personal schema.
@@ -21,20 +20,12 @@ type Personal struct {
 	ID int `json:"id,omitempty"`
 	// PersonalName holds the value of the "PersonalName" field.
 	PersonalName string `json:"PersonalName,omitempty"`
-	// PersonalMail holds the value of the "PersonalMail" field.
-	PersonalMail string `json:"PersonalMail,omitempty"`
-	// PersonalPhone holds the value of the "PersonalPhone" field.
-	PersonalPhone string `json:"PersonalPhone,omitempty"`
-	// PersonalDob holds the value of the "PersonalDob" field.
-	PersonalDob string `json:"PersonalDob,omitempty"`
-	// Added holds the value of the "Added" field.
-	Added time.Time `json:"Added,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PersonalQuery when eager-loading is set.
-	Edges           PersonalEdges `json:"edges"`
-	department_id   *int
-	jobtitle_id     *int
-	systemmember_id *int
+	Edges         PersonalEdges `json:"edges"`
+	department_id *int
+	gender_id     *int
+	jobtitle_id   *int
 }
 
 // PersonalEdges holds the relations/edges for other nodes in the graph.
@@ -43,8 +34,8 @@ type PersonalEdges struct {
 	Jobtitle *Jobtitle
 	// Department holds the value of the department edge.
 	Department *Department
-	// Systemmember holds the value of the systemmember edge.
-	Systemmember *Systemmember
+	// Gender holds the value of the gender edge.
+	Gender *Gender
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [3]bool
@@ -78,18 +69,18 @@ func (e PersonalEdges) DepartmentOrErr() (*Department, error) {
 	return nil, &NotLoadedError{edge: "department"}
 }
 
-// SystemmemberOrErr returns the Systemmember value or an error if the edge
+// GenderOrErr returns the Gender value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e PersonalEdges) SystemmemberOrErr() (*Systemmember, error) {
+func (e PersonalEdges) GenderOrErr() (*Gender, error) {
 	if e.loadedTypes[2] {
-		if e.Systemmember == nil {
-			// The edge systemmember was loaded in eager-loading,
+		if e.Gender == nil {
+			// The edge gender was loaded in eager-loading,
 			// but was not found.
-			return nil, &NotFoundError{label: systemmember.Label}
+			return nil, &NotFoundError{label: gender.Label}
 		}
-		return e.Systemmember, nil
+		return e.Gender, nil
 	}
-	return nil, &NotLoadedError{edge: "systemmember"}
+	return nil, &NotLoadedError{edge: "gender"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -97,10 +88,6 @@ func (*Personal) scanValues() []interface{} {
 	return []interface{}{
 		&sql.NullInt64{},  // id
 		&sql.NullString{}, // PersonalName
-		&sql.NullString{}, // PersonalMail
-		&sql.NullString{}, // PersonalPhone
-		&sql.NullString{}, // PersonalDob
-		&sql.NullTime{},   // Added
 	}
 }
 
@@ -108,8 +95,8 @@ func (*Personal) scanValues() []interface{} {
 func (*Personal) fkValues() []interface{} {
 	return []interface{}{
 		&sql.NullInt64{}, // department_id
+		&sql.NullInt64{}, // gender_id
 		&sql.NullInt64{}, // jobtitle_id
-		&sql.NullInt64{}, // systemmember_id
 	}
 }
 
@@ -130,27 +117,7 @@ func (pe *Personal) assignValues(values ...interface{}) error {
 	} else if value.Valid {
 		pe.PersonalName = value.String
 	}
-	if value, ok := values[1].(*sql.NullString); !ok {
-		return fmt.Errorf("unexpected type %T for field PersonalMail", values[1])
-	} else if value.Valid {
-		pe.PersonalMail = value.String
-	}
-	if value, ok := values[2].(*sql.NullString); !ok {
-		return fmt.Errorf("unexpected type %T for field PersonalPhone", values[2])
-	} else if value.Valid {
-		pe.PersonalPhone = value.String
-	}
-	if value, ok := values[3].(*sql.NullString); !ok {
-		return fmt.Errorf("unexpected type %T for field PersonalDob", values[3])
-	} else if value.Valid {
-		pe.PersonalDob = value.String
-	}
-	if value, ok := values[4].(*sql.NullTime); !ok {
-		return fmt.Errorf("unexpected type %T for field Added", values[4])
-	} else if value.Valid {
-		pe.Added = value.Time
-	}
-	values = values[5:]
+	values = values[1:]
 	if len(values) == len(personal.ForeignKeys) {
 		if value, ok := values[0].(*sql.NullInt64); !ok {
 			return fmt.Errorf("unexpected type %T for edge-field department_id", value)
@@ -159,16 +126,16 @@ func (pe *Personal) assignValues(values ...interface{}) error {
 			*pe.department_id = int(value.Int64)
 		}
 		if value, ok := values[1].(*sql.NullInt64); !ok {
+			return fmt.Errorf("unexpected type %T for edge-field gender_id", value)
+		} else if value.Valid {
+			pe.gender_id = new(int)
+			*pe.gender_id = int(value.Int64)
+		}
+		if value, ok := values[2].(*sql.NullInt64); !ok {
 			return fmt.Errorf("unexpected type %T for edge-field jobtitle_id", value)
 		} else if value.Valid {
 			pe.jobtitle_id = new(int)
 			*pe.jobtitle_id = int(value.Int64)
-		}
-		if value, ok := values[2].(*sql.NullInt64); !ok {
-			return fmt.Errorf("unexpected type %T for edge-field systemmember_id", value)
-		} else if value.Valid {
-			pe.systemmember_id = new(int)
-			*pe.systemmember_id = int(value.Int64)
 		}
 	}
 	return nil
@@ -184,9 +151,9 @@ func (pe *Personal) QueryDepartment() *DepartmentQuery {
 	return (&PersonalClient{config: pe.config}).QueryDepartment(pe)
 }
 
-// QuerySystemmember queries the systemmember edge of the Personal.
-func (pe *Personal) QuerySystemmember() *SystemmemberQuery {
-	return (&PersonalClient{config: pe.config}).QuerySystemmember(pe)
+// QueryGender queries the gender edge of the Personal.
+func (pe *Personal) QueryGender() *GenderQuery {
+	return (&PersonalClient{config: pe.config}).QueryGender(pe)
 }
 
 // Update returns a builder for updating this Personal.
@@ -214,14 +181,6 @@ func (pe *Personal) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v", pe.ID))
 	builder.WriteString(", PersonalName=")
 	builder.WriteString(pe.PersonalName)
-	builder.WriteString(", PersonalMail=")
-	builder.WriteString(pe.PersonalMail)
-	builder.WriteString(", PersonalPhone=")
-	builder.WriteString(pe.PersonalPhone)
-	builder.WriteString(", PersonalDob=")
-	builder.WriteString(pe.PersonalDob)
-	builder.WriteString(", Added=")
-	builder.WriteString(pe.Added.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

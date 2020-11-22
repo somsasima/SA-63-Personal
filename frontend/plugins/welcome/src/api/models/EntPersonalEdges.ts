@@ -18,14 +18,14 @@ import {
     EntDepartmentFromJSON,
     EntDepartmentFromJSONTyped,
     EntDepartmentToJSON,
+    EntGender,
+    EntGenderFromJSON,
+    EntGenderFromJSONTyped,
+    EntGenderToJSON,
     EntJobtitle,
     EntJobtitleFromJSON,
     EntJobtitleFromJSONTyped,
     EntJobtitleToJSON,
-    EntSystemmember,
-    EntSystemmemberFromJSON,
-    EntSystemmemberFromJSONTyped,
-    EntSystemmemberToJSON,
 } from './';
 
 /**
@@ -42,16 +42,16 @@ export interface EntPersonalEdges {
     department?: EntDepartment;
     /**
      * 
+     * @type {EntGender}
+     * @memberof EntPersonalEdges
+     */
+    gender?: EntGender;
+    /**
+     * 
      * @type {EntJobtitle}
      * @memberof EntPersonalEdges
      */
     jobtitle?: EntJobtitle;
-    /**
-     * 
-     * @type {EntSystemmember}
-     * @memberof EntPersonalEdges
-     */
-    systemmember?: EntSystemmember;
 }
 
 export function EntPersonalEdgesFromJSON(json: any): EntPersonalEdges {
@@ -65,8 +65,8 @@ export function EntPersonalEdgesFromJSONTyped(json: any, ignoreDiscriminator: bo
     return {
         
         'department': !exists(json, 'Department') ? undefined : EntDepartmentFromJSON(json['Department']),
+        'gender': !exists(json, 'Gender') ? undefined : EntGenderFromJSON(json['Gender']),
         'jobtitle': !exists(json, 'Jobtitle') ? undefined : EntJobtitleFromJSON(json['Jobtitle']),
-        'systemmember': !exists(json, 'Systemmember') ? undefined : EntSystemmemberFromJSON(json['Systemmember']),
     };
 }
 
@@ -80,8 +80,8 @@ export function EntPersonalEdgesToJSON(value?: EntPersonalEdges | null): any {
     return {
         
         'department': EntDepartmentToJSON(value.department),
+        'gender': EntGenderToJSON(value.gender),
         'jobtitle': EntJobtitleToJSON(value.jobtitle),
-        'systemmember': EntSystemmemberToJSON(value.systemmember),
     };
 }
 

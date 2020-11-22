@@ -14,12 +14,12 @@ type Tx struct {
 	config
 	// Department is the client for interacting with the Department builders.
 	Department *DepartmentClient
+	// Gender is the client for interacting with the Gender builders.
+	Gender *GenderClient
 	// Jobtitle is the client for interacting with the Jobtitle builders.
 	Jobtitle *JobtitleClient
 	// Personal is the client for interacting with the Personal builders.
 	Personal *PersonalClient
-	// Systemmember is the client for interacting with the Systemmember builders.
-	Systemmember *SystemmemberClient
 
 	// lazily loaded.
 	client     *Client
@@ -156,9 +156,9 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Department = NewDepartmentClient(tx.config)
+	tx.Gender = NewGenderClient(tx.config)
 	tx.Jobtitle = NewJobtitleClient(tx.config)
 	tx.Personal = NewPersonalClient(tx.config)
-	tx.Systemmember = NewSystemmemberClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

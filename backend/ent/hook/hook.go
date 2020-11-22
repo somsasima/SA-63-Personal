@@ -22,6 +22,19 @@ func (f DepartmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, 
 	return f(ctx, mv)
 }
 
+// The GenderFunc type is an adapter to allow the use of ordinary
+// function as Gender mutator.
+type GenderFunc func(context.Context, *ent.GenderMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f GenderFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.GenderMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.GenderMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The JobtitleFunc type is an adapter to allow the use of ordinary
 // function as Jobtitle mutator.
 type JobtitleFunc func(context.Context, *ent.JobtitleMutation) (ent.Value, error)
@@ -44,19 +57,6 @@ func (f PersonalFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, er
 	mv, ok := m.(*ent.PersonalMutation)
 	if !ok {
 		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PersonalMutation", m)
-	}
-	return f(ctx, mv)
-}
-
-// The SystemmemberFunc type is an adapter to allow the use of ordinary
-// function as Systemmember mutator.
-type SystemmemberFunc func(context.Context, *ent.SystemmemberMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f SystemmemberFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.SystemmemberMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SystemmemberMutation", m)
 	}
 	return f(ctx, mv)
 }

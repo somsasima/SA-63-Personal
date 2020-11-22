@@ -5,16 +5,15 @@ package ent
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/facebookincubator/ent/dialect/sql"
 	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
 	"github.com/facebookincubator/ent/schema/field"
 	"github.com/ssaatw/app/ent/department"
+	"github.com/ssaatw/app/ent/gender"
 	"github.com/ssaatw/app/ent/jobtitle"
 	"github.com/ssaatw/app/ent/personal"
 	"github.com/ssaatw/app/ent/predicate"
-	"github.com/ssaatw/app/ent/systemmember"
 )
 
 // PersonalUpdate is the builder for updating Personal entities.
@@ -34,38 +33,6 @@ func (pu *PersonalUpdate) Where(ps ...predicate.Personal) *PersonalUpdate {
 // SetPersonalName sets the PersonalName field.
 func (pu *PersonalUpdate) SetPersonalName(s string) *PersonalUpdate {
 	pu.mutation.SetPersonalName(s)
-	return pu
-}
-
-// SetPersonalMail sets the PersonalMail field.
-func (pu *PersonalUpdate) SetPersonalMail(s string) *PersonalUpdate {
-	pu.mutation.SetPersonalMail(s)
-	return pu
-}
-
-// SetPersonalPhone sets the PersonalPhone field.
-func (pu *PersonalUpdate) SetPersonalPhone(s string) *PersonalUpdate {
-	pu.mutation.SetPersonalPhone(s)
-	return pu
-}
-
-// SetPersonalDob sets the PersonalDob field.
-func (pu *PersonalUpdate) SetPersonalDob(s string) *PersonalUpdate {
-	pu.mutation.SetPersonalDob(s)
-	return pu
-}
-
-// SetAdded sets the Added field.
-func (pu *PersonalUpdate) SetAdded(t time.Time) *PersonalUpdate {
-	pu.mutation.SetAdded(t)
-	return pu
-}
-
-// SetNillableAdded sets the Added field if the given value is not nil.
-func (pu *PersonalUpdate) SetNillableAdded(t *time.Time) *PersonalUpdate {
-	if t != nil {
-		pu.SetAdded(*t)
-	}
 	return pu
 }
 
@@ -107,23 +74,23 @@ func (pu *PersonalUpdate) SetDepartment(d *Department) *PersonalUpdate {
 	return pu.SetDepartmentID(d.ID)
 }
 
-// SetSystemmemberID sets the systemmember edge to Systemmember by id.
-func (pu *PersonalUpdate) SetSystemmemberID(id int) *PersonalUpdate {
-	pu.mutation.SetSystemmemberID(id)
+// SetGenderID sets the gender edge to Gender by id.
+func (pu *PersonalUpdate) SetGenderID(id int) *PersonalUpdate {
+	pu.mutation.SetGenderID(id)
 	return pu
 }
 
-// SetNillableSystemmemberID sets the systemmember edge to Systemmember by id if the given value is not nil.
-func (pu *PersonalUpdate) SetNillableSystemmemberID(id *int) *PersonalUpdate {
+// SetNillableGenderID sets the gender edge to Gender by id if the given value is not nil.
+func (pu *PersonalUpdate) SetNillableGenderID(id *int) *PersonalUpdate {
 	if id != nil {
-		pu = pu.SetSystemmemberID(*id)
+		pu = pu.SetGenderID(*id)
 	}
 	return pu
 }
 
-// SetSystemmember sets the systemmember edge to Systemmember.
-func (pu *PersonalUpdate) SetSystemmember(s *Systemmember) *PersonalUpdate {
-	return pu.SetSystemmemberID(s.ID)
+// SetGender sets the gender edge to Gender.
+func (pu *PersonalUpdate) SetGender(g *Gender) *PersonalUpdate {
+	return pu.SetGenderID(g.ID)
 }
 
 // Mutation returns the PersonalMutation object of the builder.
@@ -143,9 +110,9 @@ func (pu *PersonalUpdate) ClearDepartment() *PersonalUpdate {
 	return pu
 }
 
-// ClearSystemmember clears the systemmember edge to Systemmember.
-func (pu *PersonalUpdate) ClearSystemmember() *PersonalUpdate {
-	pu.mutation.ClearSystemmember()
+// ClearGender clears the gender edge to Gender.
+func (pu *PersonalUpdate) ClearGender() *PersonalUpdate {
+	pu.mutation.ClearGender()
 	return pu
 }
 
@@ -226,34 +193,6 @@ func (pu *PersonalUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: personal.FieldPersonalName,
 		})
 	}
-	if value, ok := pu.mutation.PersonalMail(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: personal.FieldPersonalMail,
-		})
-	}
-	if value, ok := pu.mutation.PersonalPhone(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: personal.FieldPersonalPhone,
-		})
-	}
-	if value, ok := pu.mutation.PersonalDob(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: personal.FieldPersonalDob,
-		})
-	}
-	if value, ok := pu.mutation.Added(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: personal.FieldAdded,
-		})
-	}
 	if pu.mutation.JobtitleCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -324,33 +263,33 @@ func (pu *PersonalUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.SystemmemberCleared() {
+	if pu.mutation.GenderCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   personal.SystemmemberTable,
-			Columns: []string{personal.SystemmemberColumn},
+			Table:   personal.GenderTable,
+			Columns: []string{personal.GenderColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: systemmember.FieldID,
+					Column: gender.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.SystemmemberIDs(); len(nodes) > 0 {
+	if nodes := pu.mutation.GenderIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   personal.SystemmemberTable,
-			Columns: []string{personal.SystemmemberColumn},
+			Table:   personal.GenderTable,
+			Columns: []string{personal.GenderColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: systemmember.FieldID,
+					Column: gender.FieldID,
 				},
 			},
 		}
@@ -380,38 +319,6 @@ type PersonalUpdateOne struct {
 // SetPersonalName sets the PersonalName field.
 func (puo *PersonalUpdateOne) SetPersonalName(s string) *PersonalUpdateOne {
 	puo.mutation.SetPersonalName(s)
-	return puo
-}
-
-// SetPersonalMail sets the PersonalMail field.
-func (puo *PersonalUpdateOne) SetPersonalMail(s string) *PersonalUpdateOne {
-	puo.mutation.SetPersonalMail(s)
-	return puo
-}
-
-// SetPersonalPhone sets the PersonalPhone field.
-func (puo *PersonalUpdateOne) SetPersonalPhone(s string) *PersonalUpdateOne {
-	puo.mutation.SetPersonalPhone(s)
-	return puo
-}
-
-// SetPersonalDob sets the PersonalDob field.
-func (puo *PersonalUpdateOne) SetPersonalDob(s string) *PersonalUpdateOne {
-	puo.mutation.SetPersonalDob(s)
-	return puo
-}
-
-// SetAdded sets the Added field.
-func (puo *PersonalUpdateOne) SetAdded(t time.Time) *PersonalUpdateOne {
-	puo.mutation.SetAdded(t)
-	return puo
-}
-
-// SetNillableAdded sets the Added field if the given value is not nil.
-func (puo *PersonalUpdateOne) SetNillableAdded(t *time.Time) *PersonalUpdateOne {
-	if t != nil {
-		puo.SetAdded(*t)
-	}
 	return puo
 }
 
@@ -453,23 +360,23 @@ func (puo *PersonalUpdateOne) SetDepartment(d *Department) *PersonalUpdateOne {
 	return puo.SetDepartmentID(d.ID)
 }
 
-// SetSystemmemberID sets the systemmember edge to Systemmember by id.
-func (puo *PersonalUpdateOne) SetSystemmemberID(id int) *PersonalUpdateOne {
-	puo.mutation.SetSystemmemberID(id)
+// SetGenderID sets the gender edge to Gender by id.
+func (puo *PersonalUpdateOne) SetGenderID(id int) *PersonalUpdateOne {
+	puo.mutation.SetGenderID(id)
 	return puo
 }
 
-// SetNillableSystemmemberID sets the systemmember edge to Systemmember by id if the given value is not nil.
-func (puo *PersonalUpdateOne) SetNillableSystemmemberID(id *int) *PersonalUpdateOne {
+// SetNillableGenderID sets the gender edge to Gender by id if the given value is not nil.
+func (puo *PersonalUpdateOne) SetNillableGenderID(id *int) *PersonalUpdateOne {
 	if id != nil {
-		puo = puo.SetSystemmemberID(*id)
+		puo = puo.SetGenderID(*id)
 	}
 	return puo
 }
 
-// SetSystemmember sets the systemmember edge to Systemmember.
-func (puo *PersonalUpdateOne) SetSystemmember(s *Systemmember) *PersonalUpdateOne {
-	return puo.SetSystemmemberID(s.ID)
+// SetGender sets the gender edge to Gender.
+func (puo *PersonalUpdateOne) SetGender(g *Gender) *PersonalUpdateOne {
+	return puo.SetGenderID(g.ID)
 }
 
 // Mutation returns the PersonalMutation object of the builder.
@@ -489,9 +396,9 @@ func (puo *PersonalUpdateOne) ClearDepartment() *PersonalUpdateOne {
 	return puo
 }
 
-// ClearSystemmember clears the systemmember edge to Systemmember.
-func (puo *PersonalUpdateOne) ClearSystemmember() *PersonalUpdateOne {
-	puo.mutation.ClearSystemmember()
+// ClearGender clears the gender edge to Gender.
+func (puo *PersonalUpdateOne) ClearGender() *PersonalUpdateOne {
+	puo.mutation.ClearGender()
 	return puo
 }
 
@@ -570,34 +477,6 @@ func (puo *PersonalUpdateOne) sqlSave(ctx context.Context) (pe *Personal, err er
 			Column: personal.FieldPersonalName,
 		})
 	}
-	if value, ok := puo.mutation.PersonalMail(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: personal.FieldPersonalMail,
-		})
-	}
-	if value, ok := puo.mutation.PersonalPhone(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: personal.FieldPersonalPhone,
-		})
-	}
-	if value, ok := puo.mutation.PersonalDob(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: personal.FieldPersonalDob,
-		})
-	}
-	if value, ok := puo.mutation.Added(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: personal.FieldAdded,
-		})
-	}
 	if puo.mutation.JobtitleCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -668,33 +547,33 @@ func (puo *PersonalUpdateOne) sqlSave(ctx context.Context) (pe *Personal, err er
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.SystemmemberCleared() {
+	if puo.mutation.GenderCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   personal.SystemmemberTable,
-			Columns: []string{personal.SystemmemberColumn},
+			Table:   personal.GenderTable,
+			Columns: []string{personal.GenderColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: systemmember.FieldID,
+					Column: gender.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.SystemmemberIDs(); len(nodes) > 0 {
+	if nodes := puo.mutation.GenderIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   personal.SystemmemberTable,
-			Columns: []string{personal.SystemmemberColumn},
+			Table:   personal.GenderTable,
+			Columns: []string{personal.GenderColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: systemmember.FieldID,
+					Column: gender.FieldID,
 				},
 			},
 		}

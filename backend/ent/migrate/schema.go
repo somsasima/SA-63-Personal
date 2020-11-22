@@ -20,6 +20,18 @@ var (
 		PrimaryKey:  []*schema.Column{DepartmentsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{},
 	}
+	// GendersColumns holds the columns for the "genders" table.
+	GendersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "gendername", Type: field.TypeString, Unique: true},
+	}
+	// GendersTable holds the schema information for the "genders" table.
+	GendersTable = &schema.Table{
+		Name:        "genders",
+		Columns:     GendersColumns,
+		PrimaryKey:  []*schema.Column{GendersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{},
+	}
 	// JobtitlesColumns holds the columns for the "jobtitles" table.
 	JobtitlesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -36,13 +48,9 @@ var (
 	PersonalsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "personal_name", Type: field.TypeString},
-		{Name: "personal_mail", Type: field.TypeString},
-		{Name: "personal_phone", Type: field.TypeString},
-		{Name: "personal_dob", Type: field.TypeString},
-		{Name: "added", Type: field.TypeTime},
 		{Name: "department_id", Type: field.TypeInt, Nullable: true},
+		{Name: "gender_id", Type: field.TypeInt, Nullable: true},
 		{Name: "jobtitle_id", Type: field.TypeInt, Nullable: true},
-		{Name: "systemmember_id", Type: field.TypeInt, Nullable: true},
 	}
 	// PersonalsTable holds the schema information for the "personals" table.
 	PersonalsTable = &schema.Table{
@@ -52,51 +60,38 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:  "personals_departments_personal",
-				Columns: []*schema.Column{PersonalsColumns[6]},
+				Columns: []*schema.Column{PersonalsColumns[2]},
 
 				RefColumns: []*schema.Column{DepartmentsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
+				Symbol:  "personals_genders_personal",
+				Columns: []*schema.Column{PersonalsColumns[3]},
+
+				RefColumns: []*schema.Column{GendersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
 				Symbol:  "personals_jobtitles_personal",
-				Columns: []*schema.Column{PersonalsColumns[7]},
+				Columns: []*schema.Column{PersonalsColumns[4]},
 
 				RefColumns: []*schema.Column{JobtitlesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
-			{
-				Symbol:  "personals_systemmembers_personal",
-				Columns: []*schema.Column{PersonalsColumns[8]},
-
-				RefColumns: []*schema.Column{SystemmembersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
 		},
-	}
-	// SystemmembersColumns holds the columns for the "systemmembers" table.
-	SystemmembersColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "mail", Type: field.TypeString, Unique: true},
-		{Name: "password", Type: field.TypeString},
-	}
-	// SystemmembersTable holds the schema information for the "systemmembers" table.
-	SystemmembersTable = &schema.Table{
-		Name:        "systemmembers",
-		Columns:     SystemmembersColumns,
-		PrimaryKey:  []*schema.Column{SystemmembersColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		DepartmentsTable,
+		GendersTable,
 		JobtitlesTable,
 		PersonalsTable,
-		SystemmembersTable,
 	}
 )
 
 func init() {
 	PersonalsTable.ForeignKeys[0].RefTable = DepartmentsTable
-	PersonalsTable.ForeignKeys[1].RefTable = JobtitlesTable
-	PersonalsTable.ForeignKeys[2].RefTable = SystemmembersTable
+	PersonalsTable.ForeignKeys[1].RefTable = GendersTable
+	PersonalsTable.ForeignKeys[2].RefTable = JobtitlesTable
 }

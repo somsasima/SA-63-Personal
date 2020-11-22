@@ -27,35 +27,11 @@ import {
  */
 export interface EntPersonal {
     /**
-     * Added holds the value of the "Added" field.
-     * @type {string}
-     * @memberof EntPersonal
-     */
-    added?: string;
-    /**
-     * PersonalDob holds the value of the "PersonalDob" field.
-     * @type {string}
-     * @memberof EntPersonal
-     */
-    personalDob?: string;
-    /**
-     * PersonalMail holds the value of the "PersonalMail" field.
-     * @type {string}
-     * @memberof EntPersonal
-     */
-    personalMail?: string;
-    /**
      * PersonalName holds the value of the "PersonalName" field.
      * @type {string}
      * @memberof EntPersonal
      */
     personalName?: string;
-    /**
-     * PersonalPhone holds the value of the "PersonalPhone" field.
-     * @type {string}
-     * @memberof EntPersonal
-     */
-    personalPhone?: string;
     /**
      * 
      * @type {EntPersonalEdges}
@@ -80,11 +56,7 @@ export function EntPersonalFromJSONTyped(json: any, ignoreDiscriminator: boolean
     }
     return {
         
-        'added': !exists(json, 'Added') ? undefined : json['Added'],
-        'personalDob': !exists(json, 'PersonalDob') ? undefined : json['PersonalDob'],
-        'personalMail': !exists(json, 'PersonalMail') ? undefined : json['PersonalMail'],
         'personalName': !exists(json, 'PersonalName') ? undefined : json['PersonalName'],
-        'personalPhone': !exists(json, 'PersonalPhone') ? undefined : json['PersonalPhone'],
         'edges': !exists(json, 'edges') ? undefined : EntPersonalEdgesFromJSON(json['edges']),
         'id': !exists(json, 'id') ? undefined : json['id'],
     };
@@ -99,11 +71,7 @@ export function EntPersonalToJSON(value?: EntPersonal | null): any {
     }
     return {
         
-        'Added': value.added,
-        'PersonalDob': value.personalDob,
-        'PersonalMail': value.personalMail,
         'PersonalName': value.personalName,
-        'PersonalPhone': value.personalPhone,
         'edges': EntPersonalEdgesToJSON(value.edges),
         'id': value.id,
     };

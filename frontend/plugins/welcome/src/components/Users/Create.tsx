@@ -7,7 +7,6 @@ import {
   InputLabel,
   MenuItem,
   TextField,
-  Avatar,
   Button,
 } from '@material-ui/core';
 import { Alert, AlertTitle } from '@material-ui/lab';
@@ -15,12 +14,9 @@ import AddCircleOutlinedIcon from '@material-ui/icons/AddCircleOutlined';
 import CancelRoundedIcon from '@material-ui/icons/CancelRounded';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import PersonIcon from '@material-ui/icons/Person';
-import MailIcon from '@material-ui/icons/Mail';
-import PhoneIcon from '@material-ui/icons/Phone';
-import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import { DefaultApi } from '../../api/apis';
-import { EntDepartment, EntJobtitle, EntPersonal, EntSystemmember } from '../../api';
+import { EntDepartment, EntJobtitle, EntPersonal, EntGender } from '../../api';
 
 const useStyles = makeStyles((theme: Theme) =>
  createStyles({
@@ -66,7 +62,7 @@ export default function CreateUser() {
   
   const [jobtitles, setJobtitles] = React.useState<EntJobtitle[]>([]);
   const [departments, setDepartments] = React.useState<EntDepartment[]>([]);
-  const [systemmembers, setSystemmembers] = React.useState<EntSystemmember[]>([]);
+  const [genders, setGenders] = React.useState<EntGender[]>([]);
   
   const [status, setStatus] = useState(false);
   const [alert, setAlert] = useState(true);
@@ -74,13 +70,9 @@ export default function CreateUser() {
 
   const [department, setDepartment] = useState(Number);
   const [jobtitle, setJobtitle] = useState(Number);
-  const [systemmember, setSystemmember] = useState(Number);
+  const [gender, setGender] = useState(Number);
 
-  const [added, setAdded] = useState(String);
   const [personalName, setPersonalName] = useState(String);
-  const [personalMail, setPersonalMail] = useState(String);
-  const [personalPhone, setPersonalPhone] = useState(String);
-  const [personalDob, setPersonalDob] = useState(String);
 
 
   useEffect(() => {
@@ -100,13 +92,13 @@ export default function CreateUser() {
     };
     getJobtitles();
 
-    const getSystemmembers = async () => {
-      const res = await http.listSystemmember({ limit: 10, offset: 0 });
+    const getGenders = async () => {
+      const res = await http.listGender({ limit: 10, offset: 0 });
       setLoading(false);
-      setSystemmembers(res);
+      setGenders(res);
       console.log(res);
     };
-    getSystemmembers();
+    getGenders();
 
   }, [loading]);
 
@@ -115,24 +107,8 @@ export default function CreateUser() {
     setPersonal(res);
   };
 
-  const handleAddedChange = (event: any) => {
-    setAdded(event.target.value as string);
-  };
-
-  const handlePersonalDobChange = (event: any) => {
-    setPersonalDob(event.target.value as string);
-  };
-
   const handlePersonalNameChange = (event: any) => {
     setPersonalName(event.target.value as string);
-  };
-
-  const handlePersonalMailChange = (event: any) => {
-    setPersonalMail(event.target.value as string);
-  };
-
-  const handlePersonalPhoneChange = (event: any) => {
-    setPersonalPhone(event.target.value as string);
   };
   
   const JobtitlehandleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -143,8 +119,8 @@ export default function CreateUser() {
     setDepartment(event.target.value as number);
   };
 
-  const SystemmemberhandleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setSystemmember(event.target.value as number);
+  const GenderhandleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setGender(event.target.value as number);
   };
 
 
@@ -152,13 +128,9 @@ export default function CreateUser() {
 const CreatePersonal = async () => {
   const personal = {
     personalName : personalName,
-    personalMail : personalMail,
-    personalPhone : personalPhone,
-    personalDob : personalDob,
-    added : added +  ":00+07:00",
     jobtitle : jobtitle,
     department : department,
-    systemmember : systemmember,
+    gender : gender,
   };
   console.log(personals);
   const res: any = await http.createPersonal({ personal: personal });
@@ -215,66 +187,6 @@ return (
               onChange={handlePersonalNameChange}
             />
 
-          <div className={classes.paper}><strong>เมล์</strong></div>
-            <TextField className={classes.textField}
-            //style={{ width: 500 ,marginLeft:7,marginRight:-7}}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <MailIcon />
-                </InputAdornment>
-              ),
-            }}
-              id="personalMail"
-              label=""
-              variant="standard"
-              color="secondary"
-              type="string"
-              size="medium"
-              value={personalMail}
-              onChange={handlePersonalMailChange}
-            />
-
-            <div className={classes.paper}><strong>เบอร์โทร</strong></div>
-            <TextField className={classes.textField}
-            //style={{ width: 500 ,marginLeft:7,marginRight:-7}}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <PhoneIcon />
-                </InputAdornment>
-              ),
-            }}
-              id="personalPhone"
-              label=""
-              variant="standard"
-              color="secondary"
-              type="string"
-              size="medium"
-              value={personalPhone}
-              onChange={handlePersonalPhoneChange}
-            />
-
-            <div className={classes.paper}><strong>วันเกิด</strong></div>
-            <TextField className={classes.textField}
-            //style={{ width: 500 ,marginLeft:7,marginRight:-7}}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <CalendarTodayIcon />
-                </InputAdornment>
-              ),
-            }}
-              id="personalDob"
-              label=""
-              variant="standard"
-              color="secondary"
-              type="date"
-              size="medium"
-              value={personalDob}
-              onChange={handlePersonalDobChange}
-            />
-
             <div className={classes.paper}><strong>สายงาน</strong></div>
             <Select className={classes.select}
               //style={{ width: 500 ,marginLeft:7,marginRight:-7,marginTop:10}}
@@ -306,42 +218,20 @@ return (
               ))}
             </Select>
 
-            <div className={classes.paper}><strong>เจ้าหน้าที่บุคลากร</strong></div>
+            <div className={classes.paper}><strong>เพศ</strong></div>
             <Select className={classes.select}
               //style={{ width: 500 ,marginLeft:7,marginRight:-7,marginTop:10}}
               color="secondary"
-              id="systemmember"
-              value={systemmember}
-              onChange={SystemmemberhandleChange}
+              id="gender"
+              value={gender}
+              onChange={GenderhandleChange}
             >
-              <InputLabel className={classes.insideLabel}>เลือกเจ้าหน้าที่บุคลากร(Systemmember)</InputLabel>
+              <InputLabel className={classes.insideLabel}>เลือกเพศ(Systemmember)</InputLabel>
 
-              {systemmembers.map((item: EntSystemmember) => (
-                <MenuItem value={item.id}>{item.id}</MenuItem>
+              {genders.map((item: EntGender) => (
+                <MenuItem value={item.id}>{item.gendername}</MenuItem>
               ))}
             </Select>
-
-            <div className={classes.paper}><strong>วันที่</strong></div>
-            <TextField className={classes.textField}
-  //          style={{ width: 500 ,marginLeft:7,marginRight:-7}}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <CalendarTodayIcon />
-                </InputAdornment>
-              ),
-            }}
-              id="datetime-local"
-              label=""
-              type="datetime-local"
-              //defaultValue="2017-05-24T10:30"
-              onChange={handleAddedChange}
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-
-            
 
             {status ? ( 
                     <div className={classes.margin} style={{ width: 500 ,marginLeft:30,marginRight:-7,marginTop:16}}>

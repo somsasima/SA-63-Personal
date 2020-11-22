@@ -33,15 +33,14 @@ type Department struct {
 	Departmentname string
 }
 
-// Systemmembers struct type
-type Systemmembers struct {
-	Systemmember []Systemmember
+// Genders struct type
+type Genders struct {
+	Gender []Gender
 }
 
-// Systemmember struct type
-type Systemmember struct {
-	Mail     string
-	Password string
+// Gender struct type
+type Gender struct {
+	Gendername string
 }
 
 // @title SUT SA Example API Playlist Vidoe
@@ -103,19 +102,21 @@ func main() {
 	controllers.NewPersonalController(v1, client)
 	controllers.NewJobtitleController(v1, client)
 	controllers.NewDepartmentController(v1, client)
-	controllers.NewSystemmemberController(v1, client)
+	controllers.NewGenderController(v1, client)
 
 	//Set Jobtitle Data
-	jobtitles := []string{"แพทย์", "พยาบาล", "เภสัช", "เจ้าหน้าที่บุคลากร", "เจ้าหน้าที่เวชระเบียน"}
+	jobtitles := []string{"แพทย์", "พยาบาล", "เจ้าหน้าที่เภสัชกร", "เจ้าหน้าที่บุคลากร",
+		"เจ้าหน้าที่เวชระเบียน", "เจ้าหน้าที่บัญชี", "เจ้าหน้าที่จัดการหอผู้ป่วยใน"}
 	for _, jt := range jobtitles {
 		client.Jobtitle.
 			Create().
 			SetJobtitlename(jt).
 			Save(context.Background())
 	}
+
 	//Set Department Data
-	departments := []string{"อายุรกรรม", "ฉุกเฉินและอุบัติเหตุ", "ผู้ป่วยนอก", "ผู้ป่วยใน", "รังสีกรรม", "ศัลยกรรม",
-		"วิสัญญี", "กุมารเวชกรรม", "สูตินรีเวชกรรม", "เวชศาสตร์ฟื้นฟู", "จักษุ", "หู คอ จมูก", "เภสัชกรรม", "จิตเวช"}
+	departments := []string{"อายุรกรรม", "ฉุกเฉินและอุบัติเหตุ", "ผู้ป่วยนอก", "ผู้ป่วยใน", "ศัลยกรรม",
+		"กุมารเวชกรรม", "สูตินรีเวชกรรม", "จักษุ", "หู คอ จมูก", "ไม่มี"}
 	for _, d := range departments {
 		client.Department.
 			Create().
@@ -123,18 +124,12 @@ func main() {
 			Save(context.Background())
 	}
 
-	// Set Systemmembers Data
-	systemmembers := Systemmembers{
-		Systemmember: []Systemmember{
-			Systemmember{"ssaatw1@example.com", "1234"},
-		},
-	}
-
-	for _, sm := range systemmembers.Systemmember {
-		client.Systemmember.
+	//Set Gender Data
+	genders := []string{"Male", "Female"}
+	for _, g := range genders {
+		client.Gender.
 			Create().
-			SetMail(sm.Mail).
-			SetPassword(sm.Password).
+			SetGendername(g).
 			Save(context.Background())
 	}
 

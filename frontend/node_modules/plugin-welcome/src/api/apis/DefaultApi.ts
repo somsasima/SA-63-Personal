@@ -18,31 +18,35 @@ import {
     ControllersDepartment,
     ControllersDepartmentFromJSON,
     ControllersDepartmentToJSON,
+    ControllersGender,
+    ControllersGenderFromJSON,
+    ControllersGenderToJSON,
     ControllersJobtitle,
     ControllersJobtitleFromJSON,
     ControllersJobtitleToJSON,
     ControllersPersonal,
     ControllersPersonalFromJSON,
     ControllersPersonalToJSON,
-    ControllersSystemmember,
-    ControllersSystemmemberFromJSON,
-    ControllersSystemmemberToJSON,
     EntDepartment,
     EntDepartmentFromJSON,
     EntDepartmentToJSON,
+    EntGender,
+    EntGenderFromJSON,
+    EntGenderToJSON,
     EntJobtitle,
     EntJobtitleFromJSON,
     EntJobtitleToJSON,
     EntPersonal,
     EntPersonalFromJSON,
     EntPersonalToJSON,
-    EntSystemmember,
-    EntSystemmemberFromJSON,
-    EntSystemmemberToJSON,
 } from '../models';
 
 export interface CreateDepartmnetRequest {
     departmnet: ControllersDepartment;
+}
+
+export interface CreateGenderRequest {
+    gender: ControllersGender;
 }
 
 export interface CreateJobtitleRequest {
@@ -53,10 +57,6 @@ export interface CreatePersonalRequest {
     personal: ControllersPersonal;
 }
 
-export interface CreateSystemmemberRequest {
-    systemmember: ControllersSystemmember;
-}
-
 export interface DeletePersonalRequest {
     id: number;
 }
@@ -65,15 +65,20 @@ export interface GetDepartmentRequest {
     id: number;
 }
 
+export interface GetGenderRequest {
+    id: number;
+}
+
 export interface GetJobtitleRequest {
     id: number;
 }
 
-export interface GetSystemmemberRequest {
-    id: number;
+export interface ListDepartmentRequest {
+    limit?: number;
+    offset?: number;
 }
 
-export interface ListDepartmentRequest {
+export interface ListGenderRequest {
     limit?: number;
     offset?: number;
 }
@@ -84,11 +89,6 @@ export interface ListJobtitleRequest {
 }
 
 export interface ListPersonalRequest {
-    limit?: number;
-    offset?: number;
-}
-
-export interface ListSystemmemberRequest {
     limit?: number;
     offset?: number;
 }
@@ -130,6 +130,41 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async createDepartmnet(requestParameters: CreateDepartmnetRequest): Promise<ControllersDepartment> {
         const response = await this.createDepartmnetRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * Create gender
+     * Create gender
+     */
+    async createGenderRaw(requestParameters: CreateGenderRequest): Promise<runtime.ApiResponse<ControllersGender>> {
+        if (requestParameters.gender === null || requestParameters.gender === undefined) {
+            throw new runtime.RequiredError('gender','Required parameter requestParameters.gender was null or undefined when calling createGender.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/genders`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ControllersGenderToJSON(requestParameters.gender),
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ControllersGenderFromJSON(jsonValue));
+    }
+
+    /**
+     * Create gender
+     * Create gender
+     */
+    async createGender(requestParameters: CreateGenderRequest): Promise<ControllersGender> {
+        const response = await this.createGenderRaw(requestParameters);
         return await response.value();
     }
 
@@ -204,41 +239,6 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Create systemmember
-     * Create systemmember
-     */
-    async createSystemmemberRaw(requestParameters: CreateSystemmemberRequest): Promise<runtime.ApiResponse<ControllersSystemmember>> {
-        if (requestParameters.systemmember === null || requestParameters.systemmember === undefined) {
-            throw new runtime.RequiredError('systemmember','Required parameter requestParameters.systemmember was null or undefined when calling createSystemmember.');
-        }
-
-        const queryParameters: runtime.HTTPQuery = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/systemmembers`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: ControllersSystemmemberToJSON(requestParameters.systemmember),
-        });
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => ControllersSystemmemberFromJSON(jsonValue));
-    }
-
-    /**
-     * Create systemmember
-     * Create systemmember
-     */
-    async createSystemmember(requestParameters: CreateSystemmemberRequest): Promise<ControllersSystemmember> {
-        const response = await this.createSystemmemberRaw(requestParameters);
-        return await response.value();
-    }
-
-    /**
      * get personal by ID
      * Delete a personal entity by ID
      */
@@ -303,6 +303,38 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * get gender by ID
+     * Get a gender entity by ID
+     */
+    async getGenderRaw(requestParameters: GetGenderRequest): Promise<runtime.ApiResponse<EntGender>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getGender.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/genders/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => EntGenderFromJSON(jsonValue));
+    }
+
+    /**
+     * get gender by ID
+     * Get a gender entity by ID
+     */
+    async getGender(requestParameters: GetGenderRequest): Promise<EntGender> {
+        const response = await this.getGenderRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
      * get jobtitle by ID
      * Get a jobtitle entity by ID
      */
@@ -331,38 +363,6 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async getJobtitle(requestParameters: GetJobtitleRequest): Promise<EntJobtitle> {
         const response = await this.getJobtitleRaw(requestParameters);
-        return await response.value();
-    }
-
-    /**
-     * get systemmember by ID
-     * Get a systemmember entity by ID
-     */
-    async getSystemmemberRaw(requestParameters: GetSystemmemberRequest): Promise<runtime.ApiResponse<EntSystemmember>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getSystemmember.');
-        }
-
-        const queryParameters: runtime.HTTPQuery = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/systemmembers/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        });
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => EntSystemmemberFromJSON(jsonValue));
-    }
-
-    /**
-     * get systemmember by ID
-     * Get a systemmember entity by ID
-     */
-    async getSystemmember(requestParameters: GetSystemmemberRequest): Promise<EntSystemmember> {
-        const response = await this.getSystemmemberRaw(requestParameters);
         return await response.value();
     }
 
@@ -399,6 +399,42 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async listDepartment(requestParameters: ListDepartmentRequest): Promise<Array<EntDepartment>> {
         const response = await this.listDepartmentRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * list gender entities
+     * List gender entities
+     */
+    async listGenderRaw(requestParameters: ListGenderRequest): Promise<runtime.ApiResponse<Array<EntGender>>> {
+        const queryParameters: runtime.HTTPQuery = {};
+
+        if (requestParameters.limit !== undefined) {
+            queryParameters['limit'] = requestParameters.limit;
+        }
+
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/genders`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(EntGenderFromJSON));
+    }
+
+    /**
+     * list gender entities
+     * List gender entities
+     */
+    async listGender(requestParameters: ListGenderRequest): Promise<Array<EntGender>> {
+        const response = await this.listGenderRaw(requestParameters);
         return await response.value();
     }
 
@@ -471,42 +507,6 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async listPersonal(requestParameters: ListPersonalRequest): Promise<Array<EntPersonal>> {
         const response = await this.listPersonalRaw(requestParameters);
-        return await response.value();
-    }
-
-    /**
-     * list systemmember entities
-     * List systemmember entities
-     */
-    async listSystemmemberRaw(requestParameters: ListSystemmemberRequest): Promise<runtime.ApiResponse<Array<EntSystemmember>>> {
-        const queryParameters: runtime.HTTPQuery = {};
-
-        if (requestParameters.limit !== undefined) {
-            queryParameters['limit'] = requestParameters.limit;
-        }
-
-        if (requestParameters.offset !== undefined) {
-            queryParameters['offset'] = requestParameters.offset;
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/systemmembers`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        });
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(EntSystemmemberFromJSON));
-    }
-
-    /**
-     * list systemmember entities
-     * List systemmember entities
-     */
-    async listSystemmember(requestParameters: ListSystemmemberRequest): Promise<Array<EntSystemmember>> {
-        const response = await this.listSystemmemberRaw(requestParameters);
         return await response.value();
     }
 

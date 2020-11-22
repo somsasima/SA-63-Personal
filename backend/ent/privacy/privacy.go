@@ -234,6 +234,30 @@ func (f DepartmentMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Muta
 	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.DepartmentMutation", m)
 }
 
+// The GenderQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type GenderQueryRuleFunc func(context.Context, *ent.GenderQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f GenderQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.GenderQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.GenderQuery", q)
+}
+
+// The GenderMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type GenderMutationRuleFunc func(context.Context, *ent.GenderMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f GenderMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.GenderMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.GenderMutation", m)
+}
+
 // The JobtitleQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type JobtitleQueryRuleFunc func(context.Context, *ent.JobtitleQuery) error
@@ -280,28 +304,4 @@ func (f PersonalMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutati
 		return f(ctx, m)
 	}
 	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.PersonalMutation", m)
-}
-
-// The SystemmemberQueryRuleFunc type is an adapter to allow the use of ordinary
-// functions as a query rule.
-type SystemmemberQueryRuleFunc func(context.Context, *ent.SystemmemberQuery) error
-
-// EvalQuery return f(ctx, q).
-func (f SystemmemberQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
-	if q, ok := q.(*ent.SystemmemberQuery); ok {
-		return f(ctx, q)
-	}
-	return Denyf("ent/privacy: unexpected query type %T, expect *ent.SystemmemberQuery", q)
-}
-
-// The SystemmemberMutationRuleFunc type is an adapter to allow the use of ordinary
-// functions as a mutation rule.
-type SystemmemberMutationRuleFunc func(context.Context, *ent.SystemmemberMutation) error
-
-// EvalMutation calls f(ctx, m).
-func (f SystemmemberMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
-	if m, ok := m.(*ent.SystemmemberMutation); ok {
-		return f(ctx, m)
-	}
-	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.SystemmemberMutation", m)
 }

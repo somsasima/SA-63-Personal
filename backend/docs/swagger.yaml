@@ -5,6 +5,11 @@ definitions:
       departmentname:
         type: string
     type: object
+  controllers.Gender:
+    properties:
+      gendername:
+        type: string
+    type: object
   controllers.Jobtitle:
     properties:
       jobtitlename:
@@ -12,30 +17,13 @@ definitions:
     type: object
   controllers.Personal:
     properties:
-      added:
-        type: string
       department:
+        type: integer
+      gender:
         type: integer
       jobtitle:
         type: integer
-      personalDob:
-        type: string
-      personalMail:
-        type: string
       personalName:
-        type: string
-      personalPhone:
-        type: string
-      personaldata:
-        type: integer
-      systemmember:
-        type: integer
-    type: object
-  controllers.Systemmember:
-    properties:
-      mail:
-        type: string
-      password:
         type: string
     type: object
   ent.Department:
@@ -54,6 +42,29 @@ definitions:
         type: integer
     type: object
   ent.DepartmentEdges:
+    properties:
+      personal:
+        description: Personal holds the value of the personal edge.
+        items:
+          $ref: '#/definitions/ent.Personal'
+        type: array
+    type: object
+  ent.Gender:
+    properties:
+      Gendername:
+        description: Gendername holds the value of the "Gendername" field.
+        type: string
+      edges:
+        $ref: '#/definitions/ent.GenderEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the GenderQuery when eager-loading is set.
+        type: object
+      id:
+        description: ID of the ent.
+        type: integer
+    type: object
+  ent.GenderEdges:
     properties:
       personal:
         description: Personal holds the value of the personal edge.
@@ -86,20 +97,8 @@ definitions:
     type: object
   ent.Personal:
     properties:
-      Added:
-        description: Added holds the value of the "Added" field.
-        type: string
-      PersonalDob:
-        description: PersonalDob holds the value of the "PersonalDob" field.
-        type: string
-      PersonalMail:
-        description: PersonalMail holds the value of the "PersonalMail" field.
-        type: string
       PersonalName:
         description: PersonalName holds the value of the "PersonalName" field.
-        type: string
-      PersonalPhone:
-        description: PersonalPhone holds the value of the "PersonalPhone" field.
         type: string
       edges:
         $ref: '#/definitions/ent.PersonalEdges'
@@ -117,40 +116,14 @@ definitions:
         $ref: '#/definitions/ent.Department'
         description: Department holds the value of the department edge.
         type: object
+      gender:
+        $ref: '#/definitions/ent.Gender'
+        description: Gender holds the value of the gender edge.
+        type: object
       jobtitle:
         $ref: '#/definitions/ent.Jobtitle'
         description: Jobtitle holds the value of the jobtitle edge.
         type: object
-      systemmember:
-        $ref: '#/definitions/ent.Systemmember'
-        description: Systemmember holds the value of the systemmember edge.
-        type: object
-    type: object
-  ent.Systemmember:
-    properties:
-      Mail:
-        description: Mail holds the value of the "Mail" field.
-        type: string
-      Password:
-        description: Password holds the value of the "Password" field.
-        type: string
-      edges:
-        $ref: '#/definitions/ent.SystemmemberEdges'
-        description: |-
-          Edges holds the relations/edges for other nodes in the graph.
-          The values are being populated by the SystemmemberQuery when eager-loading is set.
-        type: object
-      id:
-        description: ID of the ent.
-        type: integer
-    type: object
-  ent.SystemmemberEdges:
-    properties:
-      personal:
-        description: Personal holds the value of the personal edge.
-        items:
-          $ref: '#/definitions/ent.Personal'
-        type: array
     type: object
   gin.H:
     additionalProperties: true
@@ -258,6 +231,95 @@ paths:
           schema:
             $ref: '#/definitions/gin.H'
       summary: Get a department entity by ID
+  /genders:
+    get:
+      description: list gender entities
+      operationId: list-gender
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ent.Gender'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: List gender entities
+    post:
+      consumes:
+      - application/json
+      description: Create gender
+      operationId: create-gender
+      parameters:
+      - description: Gender entity
+        in: body
+        name: gender
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.Gender'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.Gender'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Create gender
+  /genders/{id}:
+    get:
+      description: get gender by ID
+      operationId: get-gender
+      parameters:
+      - description: Gender ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ent.Gender'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get a gender entity by ID
   /jobtitles:
     get:
       description: list jobtitle entities
@@ -436,101 +498,14 @@ paths:
           schema:
             $ref: '#/definitions/gin.H'
       summary: Delete a personal entity by ID
-  /systemmembers:
-    get:
-      description: list systemmember entities
-      operationId: list-systemmember
-      parameters:
-      - description: Limit
-        in: query
-        name: limit
-        type: integer
-      - description: Offset
-        in: query
-        name: offset
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/ent.Systemmember'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/gin.H'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/gin.H'
-      summary: List systemmember entities
-    post:
-      consumes:
-      - application/json
-      description: Create systemmember
-      operationId: create-systemmember
-      parameters:
-      - description: Systemmember entity
-        in: body
-        name: systemmember
-        required: true
-        schema:
-          $ref: '#/definitions/controllers.Systemmember'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.Systemmember'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/gin.H'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/gin.H'
-      summary: Create systemmember
-  /systemmembers/{id}:
-    get:
-      description: get systemmember by ID
-      operationId: get-systemmember
-      parameters:
-      - description: Systemmember ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/ent.Systemmember'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/gin.H'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/gin.H'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/gin.H'
-      summary: Get a systemmember entity by ID
 securityDefinitions:
   ApiKeyAuth:
+    authorizationUrl: ""
     in: header
     name: Authorization
     type: apiKey
   BasicAuth:
+    authorizationUrl: ""
     type: basic
   OAuth2AccessCode:
     authorizationUrl: https://example.com/oauth/authorize
@@ -540,6 +515,7 @@ securityDefinitions:
     tokenUrl: https://example.com/oauth/token
     type: oauth2
   OAuth2Application:
+    authorizationUrl: ""
     flow: application
     scopes:
       admin: ' Grants read and write access to administrative information'
@@ -554,6 +530,7 @@ securityDefinitions:
       write: ' Grants write access'
     type: oauth2
   OAuth2Password:
+    authorizationUrl: ""
     flow: password
     scopes:
       admin: ' Grants read and write access to administrative information'

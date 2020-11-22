@@ -19,12 +19,6 @@ import {
 import PersonAddRoundedIcon from '@material-ui/icons/PersonAddRounded';
 import HomeRoundedIcon from '@material-ui/icons/HomeRounded';
 import { EntPersonal } from '../../api';
-import {
-  Avatar,
-} from '@material-ui/core';
-import moment from 'moment';
-
-
 
 const useStyles = makeStyles((theme: Theme) =>
  createStyles({
@@ -84,14 +78,10 @@ export default function ComponentsTable() {
        <TableHead>
          <TableRow>
            <TableCell align="center">No</TableCell>
-           <TableCell align="center">Name</TableCell>
-           <TableCell align="center">Mail</TableCell>
-           <TableCell align="center">Phone</TableCell>
-           <TableCell align="center">DOB</TableCell>
+           <TableCell align="center">PersonalName</TableCell>
            <TableCell align="center">Jobtitle</TableCell>
            <TableCell align="center">Department</TableCell>
-           <TableCell align="center">Systemmember</TableCell>
-           <TableCell align="center">Added</TableCell>
+           <TableCell align="center">Gender</TableCell>
            <TableCell align="center">Mange</TableCell>
          </TableRow>
        </TableHead>
@@ -101,13 +91,9 @@ export default function ComponentsTable() {
            <TableRow key={item.id}>
              <TableCell align="center">{item.id}</TableCell>
              <TableCell align="center">{item.personalName}</TableCell>
-             <TableCell align="center">{item.personalMail}</TableCell>
-             <TableCell align="center">{item.personalPhone}</TableCell>
-             <TableCell align="center">{item.personalDob}</TableCell>
              <TableCell align="center">{item.edges?.jobtitle?.jobtitlename}</TableCell>
              <TableCell align="center">{item.edges?.department?.departmentname}</TableCell>
-             <TableCell align="center">{item.edges?.systemmember?.id}</TableCell>
-             <TableCell align="center">{moment(item.added).format('DD/MM/YYYY  HH:mm')}</TableCell>
+             <TableCell align="center">{item.edges?.gender?.gendername}</TableCell>
              <TableCell align="center">
              <Button
                  onClick={() => {

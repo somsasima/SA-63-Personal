@@ -2,10 +2,6 @@
 
 package personal
 
-import (
-	"time"
-)
-
 const (
 	// Label holds the string label denoting the personal type in the database.
 	Label = "personal"
@@ -13,21 +9,13 @@ const (
 	FieldID = "id"
 	// FieldPersonalName holds the string denoting the personalname field in the database.
 	FieldPersonalName = "personal_name"
-	// FieldPersonalMail holds the string denoting the personalmail field in the database.
-	FieldPersonalMail = "personal_mail"
-	// FieldPersonalPhone holds the string denoting the personalphone field in the database.
-	FieldPersonalPhone = "personal_phone"
-	// FieldPersonalDob holds the string denoting the personaldob field in the database.
-	FieldPersonalDob = "personal_dob"
-	// FieldAdded holds the string denoting the added field in the database.
-	FieldAdded = "added"
 
 	// EdgeJobtitle holds the string denoting the jobtitle edge name in mutations.
 	EdgeJobtitle = "jobtitle"
 	// EdgeDepartment holds the string denoting the department edge name in mutations.
 	EdgeDepartment = "department"
-	// EdgeSystemmember holds the string denoting the systemmember edge name in mutations.
-	EdgeSystemmember = "systemmember"
+	// EdgeGender holds the string denoting the gender edge name in mutations.
+	EdgeGender = "gender"
 
 	// Table holds the table name of the personal in the database.
 	Table = "personals"
@@ -45,33 +33,24 @@ const (
 	DepartmentInverseTable = "departments"
 	// DepartmentColumn is the table column denoting the department relation/edge.
 	DepartmentColumn = "department_id"
-	// SystemmemberTable is the table the holds the systemmember relation/edge.
-	SystemmemberTable = "personals"
-	// SystemmemberInverseTable is the table name for the Systemmember entity.
-	// It exists in this package in order to avoid circular dependency with the "systemmember" package.
-	SystemmemberInverseTable = "systemmembers"
-	// SystemmemberColumn is the table column denoting the systemmember relation/edge.
-	SystemmemberColumn = "systemmember_id"
+	// GenderTable is the table the holds the gender relation/edge.
+	GenderTable = "personals"
+	// GenderInverseTable is the table name for the Gender entity.
+	// It exists in this package in order to avoid circular dependency with the "gender" package.
+	GenderInverseTable = "genders"
+	// GenderColumn is the table column denoting the gender relation/edge.
+	GenderColumn = "gender_id"
 )
 
 // Columns holds all SQL columns for personal fields.
 var Columns = []string{
 	FieldID,
 	FieldPersonalName,
-	FieldPersonalMail,
-	FieldPersonalPhone,
-	FieldPersonalDob,
-	FieldAdded,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the Personal type.
 var ForeignKeys = []string{
 	"department_id",
+	"gender_id",
 	"jobtitle_id",
-	"systemmember_id",
 }
-
-var (
-	// DefaultAdded holds the default value on creation for the Added field.
-	DefaultAdded func() time.Time
-)

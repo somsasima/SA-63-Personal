@@ -6,14 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
 	"github.com/facebookincubator/ent/schema/field"
 	"github.com/ssaatw/app/ent/department"
+	"github.com/ssaatw/app/ent/gender"
 	"github.com/ssaatw/app/ent/jobtitle"
 	"github.com/ssaatw/app/ent/personal"
-	"github.com/ssaatw/app/ent/systemmember"
 )
 
 // PersonalCreate is the builder for creating a Personal entity.
@@ -26,38 +25,6 @@ type PersonalCreate struct {
 // SetPersonalName sets the PersonalName field.
 func (pc *PersonalCreate) SetPersonalName(s string) *PersonalCreate {
 	pc.mutation.SetPersonalName(s)
-	return pc
-}
-
-// SetPersonalMail sets the PersonalMail field.
-func (pc *PersonalCreate) SetPersonalMail(s string) *PersonalCreate {
-	pc.mutation.SetPersonalMail(s)
-	return pc
-}
-
-// SetPersonalPhone sets the PersonalPhone field.
-func (pc *PersonalCreate) SetPersonalPhone(s string) *PersonalCreate {
-	pc.mutation.SetPersonalPhone(s)
-	return pc
-}
-
-// SetPersonalDob sets the PersonalDob field.
-func (pc *PersonalCreate) SetPersonalDob(s string) *PersonalCreate {
-	pc.mutation.SetPersonalDob(s)
-	return pc
-}
-
-// SetAdded sets the Added field.
-func (pc *PersonalCreate) SetAdded(t time.Time) *PersonalCreate {
-	pc.mutation.SetAdded(t)
-	return pc
-}
-
-// SetNillableAdded sets the Added field if the given value is not nil.
-func (pc *PersonalCreate) SetNillableAdded(t *time.Time) *PersonalCreate {
-	if t != nil {
-		pc.SetAdded(*t)
-	}
 	return pc
 }
 
@@ -99,23 +66,23 @@ func (pc *PersonalCreate) SetDepartment(d *Department) *PersonalCreate {
 	return pc.SetDepartmentID(d.ID)
 }
 
-// SetSystemmemberID sets the systemmember edge to Systemmember by id.
-func (pc *PersonalCreate) SetSystemmemberID(id int) *PersonalCreate {
-	pc.mutation.SetSystemmemberID(id)
+// SetGenderID sets the gender edge to Gender by id.
+func (pc *PersonalCreate) SetGenderID(id int) *PersonalCreate {
+	pc.mutation.SetGenderID(id)
 	return pc
 }
 
-// SetNillableSystemmemberID sets the systemmember edge to Systemmember by id if the given value is not nil.
-func (pc *PersonalCreate) SetNillableSystemmemberID(id *int) *PersonalCreate {
+// SetNillableGenderID sets the gender edge to Gender by id if the given value is not nil.
+func (pc *PersonalCreate) SetNillableGenderID(id *int) *PersonalCreate {
 	if id != nil {
-		pc = pc.SetSystemmemberID(*id)
+		pc = pc.SetGenderID(*id)
 	}
 	return pc
 }
 
-// SetSystemmember sets the systemmember edge to Systemmember.
-func (pc *PersonalCreate) SetSystemmember(s *Systemmember) *PersonalCreate {
-	return pc.SetSystemmemberID(s.ID)
+// SetGender sets the gender edge to Gender.
+func (pc *PersonalCreate) SetGender(g *Gender) *PersonalCreate {
+	return pc.SetGenderID(g.ID)
 }
 
 // Mutation returns the PersonalMutation object of the builder.
@@ -127,19 +94,6 @@ func (pc *PersonalCreate) Mutation() *PersonalMutation {
 func (pc *PersonalCreate) Save(ctx context.Context) (*Personal, error) {
 	if _, ok := pc.mutation.PersonalName(); !ok {
 		return nil, &ValidationError{Name: "PersonalName", err: errors.New("ent: missing required field \"PersonalName\"")}
-	}
-	if _, ok := pc.mutation.PersonalMail(); !ok {
-		return nil, &ValidationError{Name: "PersonalMail", err: errors.New("ent: missing required field \"PersonalMail\"")}
-	}
-	if _, ok := pc.mutation.PersonalPhone(); !ok {
-		return nil, &ValidationError{Name: "PersonalPhone", err: errors.New("ent: missing required field \"PersonalPhone\"")}
-	}
-	if _, ok := pc.mutation.PersonalDob(); !ok {
-		return nil, &ValidationError{Name: "PersonalDob", err: errors.New("ent: missing required field \"PersonalDob\"")}
-	}
-	if _, ok := pc.mutation.Added(); !ok {
-		v := personal.DefaultAdded()
-		pc.mutation.SetAdded(v)
 	}
 	var (
 		err  error
@@ -209,38 +163,6 @@ func (pc *PersonalCreate) createSpec() (*Personal, *sqlgraph.CreateSpec) {
 		})
 		pe.PersonalName = value
 	}
-	if value, ok := pc.mutation.PersonalMail(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: personal.FieldPersonalMail,
-		})
-		pe.PersonalMail = value
-	}
-	if value, ok := pc.mutation.PersonalPhone(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: personal.FieldPersonalPhone,
-		})
-		pe.PersonalPhone = value
-	}
-	if value, ok := pc.mutation.PersonalDob(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: personal.FieldPersonalDob,
-		})
-		pe.PersonalDob = value
-	}
-	if value, ok := pc.mutation.Added(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: personal.FieldAdded,
-		})
-		pe.Added = value
-	}
 	if nodes := pc.mutation.JobtitleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -279,17 +201,17 @@ func (pc *PersonalCreate) createSpec() (*Personal, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.SystemmemberIDs(); len(nodes) > 0 {
+	if nodes := pc.mutation.GenderIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   personal.SystemmemberTable,
-			Columns: []string{personal.SystemmemberColumn},
+			Table:   personal.GenderTable,
+			Columns: []string{personal.GenderColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: systemmember.FieldID,
+					Column: gender.FieldID,
 				},
 			},
 		}

@@ -10,9 +10,9 @@ import (
 	"github.com/ssaatw/app/ent/migrate"
 
 	"github.com/ssaatw/app/ent/department"
+	"github.com/ssaatw/app/ent/gender"
 	"github.com/ssaatw/app/ent/jobtitle"
 	"github.com/ssaatw/app/ent/personal"
-	"github.com/ssaatw/app/ent/systemmember"
 
 	"github.com/facebookincubator/ent/dialect"
 	"github.com/facebookincubator/ent/dialect/sql"
@@ -26,12 +26,12 @@ type Client struct {
 	Schema *migrate.Schema
 	// Department is the client for interacting with the Department builders.
 	Department *DepartmentClient
+	// Gender is the client for interacting with the Gender builders.
+	Gender *GenderClient
 	// Jobtitle is the client for interacting with the Jobtitle builders.
 	Jobtitle *JobtitleClient
 	// Personal is the client for interacting with the Personal builders.
 	Personal *PersonalClient
-	// Systemmember is the client for interacting with the Systemmember builders.
-	Systemmember *SystemmemberClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -46,9 +46,9 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Department = NewDepartmentClient(c.config)
+	c.Gender = NewGenderClient(c.config)
 	c.Jobtitle = NewJobtitleClient(c.config)
 	c.Personal = NewPersonalClient(c.config)
-	c.Systemmember = NewSystemmemberClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -79,12 +79,12 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	}
 	cfg := config{driver: tx, log: c.log, debug: c.debug, hooks: c.hooks}
 	return &Tx{
-		ctx:          ctx,
-		config:       cfg,
-		Department:   NewDepartmentClient(cfg),
-		Jobtitle:     NewJobtitleClient(cfg),
-		Personal:     NewPersonalClient(cfg),
-		Systemmember: NewSystemmemberClient(cfg),
+		ctx:        ctx,
+		config:     cfg,
+		Department: NewDepartmentClient(cfg),
+		Gender:     NewGenderClient(cfg),
+		Jobtitle:   NewJobtitleClient(cfg),
+		Personal:   NewPersonalClient(cfg),
 	}, nil
 }
 
@@ -99,11 +99,11 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	}
 	cfg := config{driver: &txDriver{tx: tx, drv: c.driver}, log: c.log, debug: c.debug, hooks: c.hooks}
 	return &Tx{
-		config:       cfg,
-		Department:   NewDepartmentClient(cfg),
-		Jobtitle:     NewJobtitleClient(cfg),
-		Personal:     NewPersonalClient(cfg),
-		Systemmember: NewSystemmemberClient(cfg),
+		config:     cfg,
+		Department: NewDepartmentClient(cfg),
+		Gender:     NewGenderClient(cfg),
+		Jobtitle:   NewJobtitleClient(cfg),
+		Personal:   NewPersonalClient(cfg),
 	}, nil
 }
 
@@ -133,9 +133,9 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Department.Use(hooks...)
+	c.Gender.Use(hooks...)
 	c.Jobtitle.Use(hooks...)
 	c.Personal.Use(hooks...)
-	c.Systemmember.Use(hooks...)
 }
 
 // DepartmentClient is a client for the Department schema.
@@ -235,6 +235,105 @@ func (c *DepartmentClient) QueryPersonal(d *Department) *PersonalQuery {
 // Hooks returns the client hooks.
 func (c *DepartmentClient) Hooks() []Hook {
 	return c.hooks.Department
+}
+
+// GenderClient is a client for the Gender schema.
+type GenderClient struct {
+	config
+}
+
+// NewGenderClient returns a client for the Gender from the given config.
+func NewGenderClient(c config) *GenderClient {
+	return &GenderClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `gender.Hooks(f(g(h())))`.
+func (c *GenderClient) Use(hooks ...Hook) {
+	c.hooks.Gender = append(c.hooks.Gender, hooks...)
+}
+
+// Create returns a create builder for Gender.
+func (c *GenderClient) Create() *GenderCreate {
+	mutation := newGenderMutation(c.config, OpCreate)
+	return &GenderCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Update returns an update builder for Gender.
+func (c *GenderClient) Update() *GenderUpdate {
+	mutation := newGenderMutation(c.config, OpUpdate)
+	return &GenderUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *GenderClient) UpdateOne(ge *Gender) *GenderUpdateOne {
+	mutation := newGenderMutation(c.config, OpUpdateOne, withGender(ge))
+	return &GenderUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *GenderClient) UpdateOneID(id int) *GenderUpdateOne {
+	mutation := newGenderMutation(c.config, OpUpdateOne, withGenderID(id))
+	return &GenderUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Gender.
+func (c *GenderClient) Delete() *GenderDelete {
+	mutation := newGenderMutation(c.config, OpDelete)
+	return &GenderDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *GenderClient) DeleteOne(ge *Gender) *GenderDeleteOne {
+	return c.DeleteOneID(ge.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *GenderClient) DeleteOneID(id int) *GenderDeleteOne {
+	builder := c.Delete().Where(gender.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &GenderDeleteOne{builder}
+}
+
+// Create returns a query builder for Gender.
+func (c *GenderClient) Query() *GenderQuery {
+	return &GenderQuery{config: c.config}
+}
+
+// Get returns a Gender entity by its id.
+func (c *GenderClient) Get(ctx context.Context, id int) (*Gender, error) {
+	return c.Query().Where(gender.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *GenderClient) GetX(ctx context.Context, id int) *Gender {
+	ge, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return ge
+}
+
+// QueryPersonal queries the personal edge of a Gender.
+func (c *GenderClient) QueryPersonal(ge *Gender) *PersonalQuery {
+	query := &PersonalQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ge.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(gender.Table, gender.FieldID, id),
+			sqlgraph.To(personal.Table, personal.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, gender.PersonalTable, gender.PersonalColumn),
+		)
+		fromV = sqlgraph.Neighbors(ge.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *GenderClient) Hooks() []Hook {
+	return c.hooks.Gender
 }
 
 // JobtitleClient is a client for the Jobtitle schema.
@@ -446,15 +545,15 @@ func (c *PersonalClient) QueryDepartment(pe *Personal) *DepartmentQuery {
 	return query
 }
 
-// QuerySystemmember queries the systemmember edge of a Personal.
-func (c *PersonalClient) QuerySystemmember(pe *Personal) *SystemmemberQuery {
-	query := &SystemmemberQuery{config: c.config}
+// QueryGender queries the gender edge of a Personal.
+func (c *PersonalClient) QueryGender(pe *Personal) *GenderQuery {
+	query := &GenderQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := pe.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(personal.Table, personal.FieldID, id),
-			sqlgraph.To(systemmember.Table, systemmember.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, personal.SystemmemberTable, personal.SystemmemberColumn),
+			sqlgraph.To(gender.Table, gender.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, personal.GenderTable, personal.GenderColumn),
 		)
 		fromV = sqlgraph.Neighbors(pe.driver.Dialect(), step)
 		return fromV, nil
@@ -465,103 +564,4 @@ func (c *PersonalClient) QuerySystemmember(pe *Personal) *SystemmemberQuery {
 // Hooks returns the client hooks.
 func (c *PersonalClient) Hooks() []Hook {
 	return c.hooks.Personal
-}
-
-// SystemmemberClient is a client for the Systemmember schema.
-type SystemmemberClient struct {
-	config
-}
-
-// NewSystemmemberClient returns a client for the Systemmember from the given config.
-func NewSystemmemberClient(c config) *SystemmemberClient {
-	return &SystemmemberClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `systemmember.Hooks(f(g(h())))`.
-func (c *SystemmemberClient) Use(hooks ...Hook) {
-	c.hooks.Systemmember = append(c.hooks.Systemmember, hooks...)
-}
-
-// Create returns a create builder for Systemmember.
-func (c *SystemmemberClient) Create() *SystemmemberCreate {
-	mutation := newSystemmemberMutation(c.config, OpCreate)
-	return &SystemmemberCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Update returns an update builder for Systemmember.
-func (c *SystemmemberClient) Update() *SystemmemberUpdate {
-	mutation := newSystemmemberMutation(c.config, OpUpdate)
-	return &SystemmemberUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *SystemmemberClient) UpdateOne(s *Systemmember) *SystemmemberUpdateOne {
-	mutation := newSystemmemberMutation(c.config, OpUpdateOne, withSystemmember(s))
-	return &SystemmemberUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *SystemmemberClient) UpdateOneID(id int) *SystemmemberUpdateOne {
-	mutation := newSystemmemberMutation(c.config, OpUpdateOne, withSystemmemberID(id))
-	return &SystemmemberUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for Systemmember.
-func (c *SystemmemberClient) Delete() *SystemmemberDelete {
-	mutation := newSystemmemberMutation(c.config, OpDelete)
-	return &SystemmemberDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a delete builder for the given entity.
-func (c *SystemmemberClient) DeleteOne(s *Systemmember) *SystemmemberDeleteOne {
-	return c.DeleteOneID(s.ID)
-}
-
-// DeleteOneID returns a delete builder for the given id.
-func (c *SystemmemberClient) DeleteOneID(id int) *SystemmemberDeleteOne {
-	builder := c.Delete().Where(systemmember.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &SystemmemberDeleteOne{builder}
-}
-
-// Create returns a query builder for Systemmember.
-func (c *SystemmemberClient) Query() *SystemmemberQuery {
-	return &SystemmemberQuery{config: c.config}
-}
-
-// Get returns a Systemmember entity by its id.
-func (c *SystemmemberClient) Get(ctx context.Context, id int) (*Systemmember, error) {
-	return c.Query().Where(systemmember.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *SystemmemberClient) GetX(ctx context.Context, id int) *Systemmember {
-	s, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return s
-}
-
-// QueryPersonal queries the personal edge of a Systemmember.
-func (c *SystemmemberClient) QueryPersonal(s *Systemmember) *PersonalQuery {
-	query := &PersonalQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := s.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(systemmember.Table, systemmember.FieldID, id),
-			sqlgraph.To(personal.Table, personal.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, systemmember.PersonalTable, systemmember.PersonalColumn),
-		)
-		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *SystemmemberClient) Hooks() []Hook {
-	return c.hooks.Systemmember
 }

@@ -21,16 +21,16 @@ import { exists, mapValues } from '../runtime';
 export interface ControllersPersonal {
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof ControllersPersonal
      */
-    added?: string;
+    department?: number;
     /**
      * 
      * @type {number}
      * @memberof ControllersPersonal
      */
-    department?: number;
+    gender?: number;
     /**
      * 
      * @type {number}
@@ -42,37 +42,7 @@ export interface ControllersPersonal {
      * @type {string}
      * @memberof ControllersPersonal
      */
-    personalDob?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ControllersPersonal
-     */
-    personalMail?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ControllersPersonal
-     */
     personalName?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ControllersPersonal
-     */
-    personalPhone?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof ControllersPersonal
-     */
-    personaldata?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof ControllersPersonal
-     */
-    systemmember?: number;
 }
 
 export function ControllersPersonalFromJSON(json: any): ControllersPersonal {
@@ -85,15 +55,10 @@ export function ControllersPersonalFromJSONTyped(json: any, ignoreDiscriminator:
     }
     return {
         
-        'added': !exists(json, 'added') ? undefined : json['added'],
         'department': !exists(json, 'department') ? undefined : json['department'],
+        'gender': !exists(json, 'gender') ? undefined : json['gender'],
         'jobtitle': !exists(json, 'jobtitle') ? undefined : json['jobtitle'],
-        'personalDob': !exists(json, 'personalDob') ? undefined : json['personalDob'],
-        'personalMail': !exists(json, 'personalMail') ? undefined : json['personalMail'],
         'personalName': !exists(json, 'personalName') ? undefined : json['personalName'],
-        'personalPhone': !exists(json, 'personalPhone') ? undefined : json['personalPhone'],
-        'personaldata': !exists(json, 'personaldata') ? undefined : json['personaldata'],
-        'systemmember': !exists(json, 'systemmember') ? undefined : json['systemmember'],
     };
 }
 
@@ -106,15 +71,10 @@ export function ControllersPersonalToJSON(value?: ControllersPersonal | null): a
     }
     return {
         
-        'added': value.added,
         'department': value.department,
+        'gender': value.gender,
         'jobtitle': value.jobtitle,
-        'personalDob': value.personalDob,
-        'personalMail': value.personalMail,
         'personalName': value.personalName,
-        'personalPhone': value.personalPhone,
-        'personaldata': value.personaldata,
-        'systemmember': value.systemmember,
     };
 }
 

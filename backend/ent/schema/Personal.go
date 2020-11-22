@@ -1,8 +1,6 @@
 package schema
 
 import (
-	"time"
-
 	"github.com/facebookincubator/ent"
 	"github.com/facebookincubator/ent/schema/edge"
 	"github.com/facebookincubator/ent/schema/field"
@@ -17,10 +15,6 @@ type Personal struct {
 func (Personal) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("PersonalName"),
-		field.String("PersonalMail"),
-		field.String("PersonalPhone"),
-		field.String("PersonalDob"),
-		field.Time("Added").Default(time.Now),
 	}
 }
 
@@ -29,6 +23,6 @@ func (Personal) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("jobtitle", Jobtitle.Type).Ref("personal").Unique(),
 		edge.From("department", Department.Type).Ref("personal").Unique(),
-		edge.From("systemmember", Systemmember.Type).Ref("personal").Unique(),	
+		edge.From("gender", Gender.Type).Ref("personal").Unique(),
 	}
 }

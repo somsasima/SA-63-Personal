@@ -6,12 +6,11 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	"time"
 
 	"github.com/ssaatw/app/ent/department"
+	"github.com/ssaatw/app/ent/gender"
 	"github.com/ssaatw/app/ent/jobtitle"
 	"github.com/ssaatw/app/ent/personal"
-	"github.com/ssaatw/app/ent/systemmember"
 
 	"github.com/facebookincubator/ent"
 )
@@ -25,10 +24,10 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeDepartment   = "Department"
-	TypeJobtitle     = "Jobtitle"
-	TypePersonal     = "Personal"
-	TypeSystemmember = "Systemmember"
+	TypeDepartment = "Department"
+	TypeGender     = "Gender"
+	TypeJobtitle   = "Jobtitle"
+	TypePersonal   = "Personal"
 )
 
 // DepartmentMutation represents an operation that mutate the Departments
@@ -397,6 +396,374 @@ func (m *DepartmentMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Department edge %s", name)
+}
+
+// GenderMutation represents an operation that mutate the Genders
+// nodes in the graph.
+type GenderMutation struct {
+	config
+	op              Op
+	typ             string
+	id              *int
+	_Gendername     *string
+	clearedFields   map[string]struct{}
+	personal        map[int]struct{}
+	removedpersonal map[int]struct{}
+	done            bool
+	oldValue        func(context.Context) (*Gender, error)
+}
+
+var _ ent.Mutation = (*GenderMutation)(nil)
+
+// genderOption allows to manage the mutation configuration using functional options.
+type genderOption func(*GenderMutation)
+
+// newGenderMutation creates new mutation for $n.Name.
+func newGenderMutation(c config, op Op, opts ...genderOption) *GenderMutation {
+	m := &GenderMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeGender,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withGenderID sets the id field of the mutation.
+func withGenderID(id int) genderOption {
+	return func(m *GenderMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Gender
+		)
+		m.oldValue = func(ctx context.Context) (*Gender, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Gender.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withGender sets the old Gender of the mutation.
+func withGender(node *Gender) genderOption {
+	return func(m *GenderMutation) {
+		m.oldValue = func(context.Context) (*Gender, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m GenderMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m GenderMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the id value in the mutation. Note that, the id
+// is available only if it was provided to the builder.
+func (m *GenderMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetGendername sets the Gendername field.
+func (m *GenderMutation) SetGendername(s string) {
+	m._Gendername = &s
+}
+
+// Gendername returns the Gendername value in the mutation.
+func (m *GenderMutation) Gendername() (r string, exists bool) {
+	v := m._Gendername
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGendername returns the old Gendername value of the Gender.
+// If the Gender object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *GenderMutation) OldGendername(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldGendername is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldGendername requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGendername: %w", err)
+	}
+	return oldValue.Gendername, nil
+}
+
+// ResetGendername reset all changes of the "Gendername" field.
+func (m *GenderMutation) ResetGendername() {
+	m._Gendername = nil
+}
+
+// AddPersonalIDs adds the personal edge to Personal by ids.
+func (m *GenderMutation) AddPersonalIDs(ids ...int) {
+	if m.personal == nil {
+		m.personal = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.personal[ids[i]] = struct{}{}
+	}
+}
+
+// RemovePersonalIDs removes the personal edge to Personal by ids.
+func (m *GenderMutation) RemovePersonalIDs(ids ...int) {
+	if m.removedpersonal == nil {
+		m.removedpersonal = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.removedpersonal[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedPersonal returns the removed ids of personal.
+func (m *GenderMutation) RemovedPersonalIDs() (ids []int) {
+	for id := range m.removedpersonal {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// PersonalIDs returns the personal ids in the mutation.
+func (m *GenderMutation) PersonalIDs() (ids []int) {
+	for id := range m.personal {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetPersonal reset all changes of the "personal" edge.
+func (m *GenderMutation) ResetPersonal() {
+	m.personal = nil
+	m.removedpersonal = nil
+}
+
+// Op returns the operation name.
+func (m *GenderMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (Gender).
+func (m *GenderMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during
+// this mutation. Note that, in order to get all numeric
+// fields that were in/decremented, call AddedFields().
+func (m *GenderMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m._Gendername != nil {
+		fields = append(fields, gender.FieldGendername)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name.
+// The second boolean value indicates that this field was
+// not set, or was not define in the schema.
+func (m *GenderMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case gender.FieldGendername:
+		return m.Gendername()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database.
+// An error is returned if the mutation operation is not UpdateOne,
+// or the query to the database was failed.
+func (m *GenderMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case gender.FieldGendername:
+		return m.OldGendername(ctx)
+	}
+	return nil, fmt.Errorf("unknown Gender field %s", name)
+}
+
+// SetField sets the value for the given name. It returns an
+// error if the field is not defined in the schema, or if the
+// type mismatch the field type.
+func (m *GenderMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case gender.FieldGendername:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGendername(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Gender field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented
+// or decremented during this mutation.
+func (m *GenderMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was in/decremented
+// from a field with the given name. The second value indicates
+// that this field was not set, or was not define in the schema.
+func (m *GenderMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value for the given name. It returns an
+// error if the field is not defined in the schema, or if the
+// type mismatch the field type.
+func (m *GenderMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Gender numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared
+// during this mutation.
+func (m *GenderMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicates if this field was
+// cleared in this mutation.
+func (m *GenderMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value for the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *GenderMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Gender nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation regarding the
+// given field name. It returns an error if the field is not
+// defined in the schema.
+func (m *GenderMutation) ResetField(name string) error {
+	switch name {
+	case gender.FieldGendername:
+		m.ResetGendername()
+		return nil
+	}
+	return fmt.Errorf("unknown Gender field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this
+// mutation.
+func (m *GenderMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.personal != nil {
+		edges = append(edges, gender.EdgePersonal)
+	}
+	return edges
+}
+
+// AddedIDs returns all ids (to other nodes) that were added for
+// the given edge name.
+func (m *GenderMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case gender.EdgePersonal:
+		ids := make([]ent.Value, 0, len(m.personal))
+		for id := range m.personal {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this
+// mutation.
+func (m *GenderMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedpersonal != nil {
+		edges = append(edges, gender.EdgePersonal)
+	}
+	return edges
+}
+
+// RemovedIDs returns all ids (to other nodes) that were removed for
+// the given edge name.
+func (m *GenderMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case gender.EdgePersonal:
+		ids := make([]ent.Value, 0, len(m.removedpersonal))
+		for id := range m.removedpersonal {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this
+// mutation.
+func (m *GenderMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// EdgeCleared returns a boolean indicates if this edge was
+// cleared in this mutation.
+func (m *GenderMutation) EdgeCleared(name string) bool {
+	switch name {
+	}
+	return false
+}
+
+// ClearEdge clears the value for the given name. It returns an
+// error if the edge name is not defined in the schema.
+func (m *GenderMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Gender unique edge %s", name)
+}
+
+// ResetEdge resets all changes in the mutation regarding the
+// given edge name. It returns an error if the edge is not
+// defined in the schema.
+func (m *GenderMutation) ResetEdge(name string) error {
+	switch name {
+	case gender.EdgePersonal:
+		m.ResetPersonal()
+		return nil
+	}
+	return fmt.Errorf("unknown Gender edge %s", name)
 }
 
 // JobtitleMutation represents an operation that mutate the Jobtitles
@@ -771,23 +1138,19 @@ func (m *JobtitleMutation) ResetEdge(name string) error {
 // nodes in the graph.
 type PersonalMutation struct {
 	config
-	op                  Op
-	typ                 string
-	id                  *int
-	_PersonalName       *string
-	_PersonalMail       *string
-	_PersonalPhone      *string
-	_PersonalDob        *string
-	_Added              *time.Time
-	clearedFields       map[string]struct{}
-	jobtitle            *int
-	clearedjobtitle     bool
-	department          *int
-	cleareddepartment   bool
-	systemmember        *int
-	clearedsystemmember bool
-	done                bool
-	oldValue            func(context.Context) (*Personal, error)
+	op                Op
+	typ               string
+	id                *int
+	_PersonalName     *string
+	clearedFields     map[string]struct{}
+	jobtitle          *int
+	clearedjobtitle   bool
+	department        *int
+	cleareddepartment bool
+	gender            *int
+	clearedgender     bool
+	done              bool
+	oldValue          func(context.Context) (*Personal, error)
 }
 
 var _ ent.Mutation = (*PersonalMutation)(nil)
@@ -906,154 +1269,6 @@ func (m *PersonalMutation) ResetPersonalName() {
 	m._PersonalName = nil
 }
 
-// SetPersonalMail sets the PersonalMail field.
-func (m *PersonalMutation) SetPersonalMail(s string) {
-	m._PersonalMail = &s
-}
-
-// PersonalMail returns the PersonalMail value in the mutation.
-func (m *PersonalMutation) PersonalMail() (r string, exists bool) {
-	v := m._PersonalMail
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldPersonalMail returns the old PersonalMail value of the Personal.
-// If the Personal object wasn't provided to the builder, the object is fetched
-// from the database.
-// An error is returned if the mutation operation is not UpdateOne, or database query fails.
-func (m *PersonalMutation) OldPersonalMail(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldPersonalMail is allowed only on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldPersonalMail requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPersonalMail: %w", err)
-	}
-	return oldValue.PersonalMail, nil
-}
-
-// ResetPersonalMail reset all changes of the "PersonalMail" field.
-func (m *PersonalMutation) ResetPersonalMail() {
-	m._PersonalMail = nil
-}
-
-// SetPersonalPhone sets the PersonalPhone field.
-func (m *PersonalMutation) SetPersonalPhone(s string) {
-	m._PersonalPhone = &s
-}
-
-// PersonalPhone returns the PersonalPhone value in the mutation.
-func (m *PersonalMutation) PersonalPhone() (r string, exists bool) {
-	v := m._PersonalPhone
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldPersonalPhone returns the old PersonalPhone value of the Personal.
-// If the Personal object wasn't provided to the builder, the object is fetched
-// from the database.
-// An error is returned if the mutation operation is not UpdateOne, or database query fails.
-func (m *PersonalMutation) OldPersonalPhone(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldPersonalPhone is allowed only on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldPersonalPhone requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPersonalPhone: %w", err)
-	}
-	return oldValue.PersonalPhone, nil
-}
-
-// ResetPersonalPhone reset all changes of the "PersonalPhone" field.
-func (m *PersonalMutation) ResetPersonalPhone() {
-	m._PersonalPhone = nil
-}
-
-// SetPersonalDob sets the PersonalDob field.
-func (m *PersonalMutation) SetPersonalDob(s string) {
-	m._PersonalDob = &s
-}
-
-// PersonalDob returns the PersonalDob value in the mutation.
-func (m *PersonalMutation) PersonalDob() (r string, exists bool) {
-	v := m._PersonalDob
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldPersonalDob returns the old PersonalDob value of the Personal.
-// If the Personal object wasn't provided to the builder, the object is fetched
-// from the database.
-// An error is returned if the mutation operation is not UpdateOne, or database query fails.
-func (m *PersonalMutation) OldPersonalDob(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldPersonalDob is allowed only on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldPersonalDob requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPersonalDob: %w", err)
-	}
-	return oldValue.PersonalDob, nil
-}
-
-// ResetPersonalDob reset all changes of the "PersonalDob" field.
-func (m *PersonalMutation) ResetPersonalDob() {
-	m._PersonalDob = nil
-}
-
-// SetAdded sets the Added field.
-func (m *PersonalMutation) SetAdded(t time.Time) {
-	m._Added = &t
-}
-
-// Added returns the Added value in the mutation.
-func (m *PersonalMutation) Added() (r time.Time, exists bool) {
-	v := m._Added
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldAdded returns the old Added value of the Personal.
-// If the Personal object wasn't provided to the builder, the object is fetched
-// from the database.
-// An error is returned if the mutation operation is not UpdateOne, or database query fails.
-func (m *PersonalMutation) OldAdded(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldAdded is allowed only on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldAdded requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAdded: %w", err)
-	}
-	return oldValue.Added, nil
-}
-
-// ResetAdded reset all changes of the "Added" field.
-func (m *PersonalMutation) ResetAdded() {
-	m._Added = nil
-}
-
 // SetJobtitleID sets the jobtitle edge to Jobtitle by id.
 func (m *PersonalMutation) SetJobtitleID(id int) {
 	m.jobtitle = &id
@@ -1132,43 +1347,43 @@ func (m *PersonalMutation) ResetDepartment() {
 	m.cleareddepartment = false
 }
 
-// SetSystemmemberID sets the systemmember edge to Systemmember by id.
-func (m *PersonalMutation) SetSystemmemberID(id int) {
-	m.systemmember = &id
+// SetGenderID sets the gender edge to Gender by id.
+func (m *PersonalMutation) SetGenderID(id int) {
+	m.gender = &id
 }
 
-// ClearSystemmember clears the systemmember edge to Systemmember.
-func (m *PersonalMutation) ClearSystemmember() {
-	m.clearedsystemmember = true
+// ClearGender clears the gender edge to Gender.
+func (m *PersonalMutation) ClearGender() {
+	m.clearedgender = true
 }
 
-// SystemmemberCleared returns if the edge systemmember was cleared.
-func (m *PersonalMutation) SystemmemberCleared() bool {
-	return m.clearedsystemmember
+// GenderCleared returns if the edge gender was cleared.
+func (m *PersonalMutation) GenderCleared() bool {
+	return m.clearedgender
 }
 
-// SystemmemberID returns the systemmember id in the mutation.
-func (m *PersonalMutation) SystemmemberID() (id int, exists bool) {
-	if m.systemmember != nil {
-		return *m.systemmember, true
+// GenderID returns the gender id in the mutation.
+func (m *PersonalMutation) GenderID() (id int, exists bool) {
+	if m.gender != nil {
+		return *m.gender, true
 	}
 	return
 }
 
-// SystemmemberIDs returns the systemmember ids in the mutation.
+// GenderIDs returns the gender ids in the mutation.
 // Note that ids always returns len(ids) <= 1 for unique edges, and you should use
-// SystemmemberID instead. It exists only for internal usage by the builders.
-func (m *PersonalMutation) SystemmemberIDs() (ids []int) {
-	if id := m.systemmember; id != nil {
+// GenderID instead. It exists only for internal usage by the builders.
+func (m *PersonalMutation) GenderIDs() (ids []int) {
+	if id := m.gender; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetSystemmember reset all changes of the "systemmember" edge.
-func (m *PersonalMutation) ResetSystemmember() {
-	m.systemmember = nil
-	m.clearedsystemmember = false
+// ResetGender reset all changes of the "gender" edge.
+func (m *PersonalMutation) ResetGender() {
+	m.gender = nil
+	m.clearedgender = false
 }
 
 // Op returns the operation name.
@@ -1185,21 +1400,9 @@ func (m *PersonalMutation) Type() string {
 // this mutation. Note that, in order to get all numeric
 // fields that were in/decremented, call AddedFields().
 func (m *PersonalMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 1)
 	if m._PersonalName != nil {
 		fields = append(fields, personal.FieldPersonalName)
-	}
-	if m._PersonalMail != nil {
-		fields = append(fields, personal.FieldPersonalMail)
-	}
-	if m._PersonalPhone != nil {
-		fields = append(fields, personal.FieldPersonalPhone)
-	}
-	if m._PersonalDob != nil {
-		fields = append(fields, personal.FieldPersonalDob)
-	}
-	if m._Added != nil {
-		fields = append(fields, personal.FieldAdded)
 	}
 	return fields
 }
@@ -1211,14 +1414,6 @@ func (m *PersonalMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case personal.FieldPersonalName:
 		return m.PersonalName()
-	case personal.FieldPersonalMail:
-		return m.PersonalMail()
-	case personal.FieldPersonalPhone:
-		return m.PersonalPhone()
-	case personal.FieldPersonalDob:
-		return m.PersonalDob()
-	case personal.FieldAdded:
-		return m.Added()
 	}
 	return nil, false
 }
@@ -1230,14 +1425,6 @@ func (m *PersonalMutation) OldField(ctx context.Context, name string) (ent.Value
 	switch name {
 	case personal.FieldPersonalName:
 		return m.OldPersonalName(ctx)
-	case personal.FieldPersonalMail:
-		return m.OldPersonalMail(ctx)
-	case personal.FieldPersonalPhone:
-		return m.OldPersonalPhone(ctx)
-	case personal.FieldPersonalDob:
-		return m.OldPersonalDob(ctx)
-	case personal.FieldAdded:
-		return m.OldAdded(ctx)
 	}
 	return nil, fmt.Errorf("unknown Personal field %s", name)
 }
@@ -1253,34 +1440,6 @@ func (m *PersonalMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPersonalName(v)
-		return nil
-	case personal.FieldPersonalMail:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetPersonalMail(v)
-		return nil
-	case personal.FieldPersonalPhone:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetPersonalPhone(v)
-		return nil
-	case personal.FieldPersonalDob:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetPersonalDob(v)
-		return nil
-	case personal.FieldAdded:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetAdded(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Personal field %s", name)
@@ -1335,18 +1494,6 @@ func (m *PersonalMutation) ResetField(name string) error {
 	case personal.FieldPersonalName:
 		m.ResetPersonalName()
 		return nil
-	case personal.FieldPersonalMail:
-		m.ResetPersonalMail()
-		return nil
-	case personal.FieldPersonalPhone:
-		m.ResetPersonalPhone()
-		return nil
-	case personal.FieldPersonalDob:
-		m.ResetPersonalDob()
-		return nil
-	case personal.FieldAdded:
-		m.ResetAdded()
-		return nil
 	}
 	return fmt.Errorf("unknown Personal field %s", name)
 }
@@ -1361,8 +1508,8 @@ func (m *PersonalMutation) AddedEdges() []string {
 	if m.department != nil {
 		edges = append(edges, personal.EdgeDepartment)
 	}
-	if m.systemmember != nil {
-		edges = append(edges, personal.EdgeSystemmember)
+	if m.gender != nil {
+		edges = append(edges, personal.EdgeGender)
 	}
 	return edges
 }
@@ -1379,8 +1526,8 @@ func (m *PersonalMutation) AddedIDs(name string) []ent.Value {
 		if id := m.department; id != nil {
 			return []ent.Value{*id}
 		}
-	case personal.EdgeSystemmember:
-		if id := m.systemmember; id != nil {
+	case personal.EdgeGender:
+		if id := m.gender; id != nil {
 			return []ent.Value{*id}
 		}
 	}
@@ -1412,8 +1559,8 @@ func (m *PersonalMutation) ClearedEdges() []string {
 	if m.cleareddepartment {
 		edges = append(edges, personal.EdgeDepartment)
 	}
-	if m.clearedsystemmember {
-		edges = append(edges, personal.EdgeSystemmember)
+	if m.clearedgender {
+		edges = append(edges, personal.EdgeGender)
 	}
 	return edges
 }
@@ -1426,8 +1573,8 @@ func (m *PersonalMutation) EdgeCleared(name string) bool {
 		return m.clearedjobtitle
 	case personal.EdgeDepartment:
 		return m.cleareddepartment
-	case personal.EdgeSystemmember:
-		return m.clearedsystemmember
+	case personal.EdgeGender:
+		return m.clearedgender
 	}
 	return false
 }
@@ -1442,8 +1589,8 @@ func (m *PersonalMutation) ClearEdge(name string) error {
 	case personal.EdgeDepartment:
 		m.ClearDepartment()
 		return nil
-	case personal.EdgeSystemmember:
-		m.ClearSystemmember()
+	case personal.EdgeGender:
+		m.ClearGender()
 		return nil
 	}
 	return fmt.Errorf("unknown Personal unique edge %s", name)
@@ -1460,432 +1607,9 @@ func (m *PersonalMutation) ResetEdge(name string) error {
 	case personal.EdgeDepartment:
 		m.ResetDepartment()
 		return nil
-	case personal.EdgeSystemmember:
-		m.ResetSystemmember()
+	case personal.EdgeGender:
+		m.ResetGender()
 		return nil
 	}
 	return fmt.Errorf("unknown Personal edge %s", name)
-}
-
-// SystemmemberMutation represents an operation that mutate the Systemmembers
-// nodes in the graph.
-type SystemmemberMutation struct {
-	config
-	op              Op
-	typ             string
-	id              *int
-	_Mail           *string
-	_Password       *string
-	clearedFields   map[string]struct{}
-	personal        map[int]struct{}
-	removedpersonal map[int]struct{}
-	done            bool
-	oldValue        func(context.Context) (*Systemmember, error)
-}
-
-var _ ent.Mutation = (*SystemmemberMutation)(nil)
-
-// systemmemberOption allows to manage the mutation configuration using functional options.
-type systemmemberOption func(*SystemmemberMutation)
-
-// newSystemmemberMutation creates new mutation for $n.Name.
-func newSystemmemberMutation(c config, op Op, opts ...systemmemberOption) *SystemmemberMutation {
-	m := &SystemmemberMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeSystemmember,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withSystemmemberID sets the id field of the mutation.
-func withSystemmemberID(id int) systemmemberOption {
-	return func(m *SystemmemberMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *Systemmember
-		)
-		m.oldValue = func(ctx context.Context) (*Systemmember, error) {
-			once.Do(func() {
-				if m.done {
-					err = fmt.Errorf("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().Systemmember.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withSystemmember sets the old Systemmember of the mutation.
-func withSystemmember(node *Systemmember) systemmemberOption {
-	return func(m *SystemmemberMutation) {
-		m.oldValue = func(context.Context) (*Systemmember, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m SystemmemberMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m SystemmemberMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// ID returns the id value in the mutation. Note that, the id
-// is available only if it was provided to the builder.
-func (m *SystemmemberMutation) ID() (id int, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// SetMail sets the Mail field.
-func (m *SystemmemberMutation) SetMail(s string) {
-	m._Mail = &s
-}
-
-// Mail returns the Mail value in the mutation.
-func (m *SystemmemberMutation) Mail() (r string, exists bool) {
-	v := m._Mail
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldMail returns the old Mail value of the Systemmember.
-// If the Systemmember object wasn't provided to the builder, the object is fetched
-// from the database.
-// An error is returned if the mutation operation is not UpdateOne, or database query fails.
-func (m *SystemmemberMutation) OldMail(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldMail is allowed only on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldMail requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldMail: %w", err)
-	}
-	return oldValue.Mail, nil
-}
-
-// ResetMail reset all changes of the "Mail" field.
-func (m *SystemmemberMutation) ResetMail() {
-	m._Mail = nil
-}
-
-// SetPassword sets the Password field.
-func (m *SystemmemberMutation) SetPassword(s string) {
-	m._Password = &s
-}
-
-// Password returns the Password value in the mutation.
-func (m *SystemmemberMutation) Password() (r string, exists bool) {
-	v := m._Password
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldPassword returns the old Password value of the Systemmember.
-// If the Systemmember object wasn't provided to the builder, the object is fetched
-// from the database.
-// An error is returned if the mutation operation is not UpdateOne, or database query fails.
-func (m *SystemmemberMutation) OldPassword(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldPassword is allowed only on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldPassword requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPassword: %w", err)
-	}
-	return oldValue.Password, nil
-}
-
-// ResetPassword reset all changes of the "Password" field.
-func (m *SystemmemberMutation) ResetPassword() {
-	m._Password = nil
-}
-
-// AddPersonalIDs adds the personal edge to Personal by ids.
-func (m *SystemmemberMutation) AddPersonalIDs(ids ...int) {
-	if m.personal == nil {
-		m.personal = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.personal[ids[i]] = struct{}{}
-	}
-}
-
-// RemovePersonalIDs removes the personal edge to Personal by ids.
-func (m *SystemmemberMutation) RemovePersonalIDs(ids ...int) {
-	if m.removedpersonal == nil {
-		m.removedpersonal = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.removedpersonal[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedPersonal returns the removed ids of personal.
-func (m *SystemmemberMutation) RemovedPersonalIDs() (ids []int) {
-	for id := range m.removedpersonal {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// PersonalIDs returns the personal ids in the mutation.
-func (m *SystemmemberMutation) PersonalIDs() (ids []int) {
-	for id := range m.personal {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetPersonal reset all changes of the "personal" edge.
-func (m *SystemmemberMutation) ResetPersonal() {
-	m.personal = nil
-	m.removedpersonal = nil
-}
-
-// Op returns the operation name.
-func (m *SystemmemberMutation) Op() Op {
-	return m.op
-}
-
-// Type returns the node type of this mutation (Systemmember).
-func (m *SystemmemberMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during
-// this mutation. Note that, in order to get all numeric
-// fields that were in/decremented, call AddedFields().
-func (m *SystemmemberMutation) Fields() []string {
-	fields := make([]string, 0, 2)
-	if m._Mail != nil {
-		fields = append(fields, systemmember.FieldMail)
-	}
-	if m._Password != nil {
-		fields = append(fields, systemmember.FieldPassword)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name.
-// The second boolean value indicates that this field was
-// not set, or was not define in the schema.
-func (m *SystemmemberMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case systemmember.FieldMail:
-		return m.Mail()
-	case systemmember.FieldPassword:
-		return m.Password()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database.
-// An error is returned if the mutation operation is not UpdateOne,
-// or the query to the database was failed.
-func (m *SystemmemberMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case systemmember.FieldMail:
-		return m.OldMail(ctx)
-	case systemmember.FieldPassword:
-		return m.OldPassword(ctx)
-	}
-	return nil, fmt.Errorf("unknown Systemmember field %s", name)
-}
-
-// SetField sets the value for the given name. It returns an
-// error if the field is not defined in the schema, or if the
-// type mismatch the field type.
-func (m *SystemmemberMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case systemmember.FieldMail:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetMail(v)
-		return nil
-	case systemmember.FieldPassword:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetPassword(v)
-		return nil
-	}
-	return fmt.Errorf("unknown Systemmember field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented
-// or decremented during this mutation.
-func (m *SystemmemberMutation) AddedFields() []string {
-	return nil
-}
-
-// AddedField returns the numeric value that was in/decremented
-// from a field with the given name. The second value indicates
-// that this field was not set, or was not define in the schema.
-func (m *SystemmemberMutation) AddedField(name string) (ent.Value, bool) {
-	return nil, false
-}
-
-// AddField adds the value for the given name. It returns an
-// error if the field is not defined in the schema, or if the
-// type mismatch the field type.
-func (m *SystemmemberMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	}
-	return fmt.Errorf("unknown Systemmember numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared
-// during this mutation.
-func (m *SystemmemberMutation) ClearedFields() []string {
-	return nil
-}
-
-// FieldCleared returns a boolean indicates if this field was
-// cleared in this mutation.
-func (m *SystemmemberMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value for the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *SystemmemberMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown Systemmember nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation regarding the
-// given field name. It returns an error if the field is not
-// defined in the schema.
-func (m *SystemmemberMutation) ResetField(name string) error {
-	switch name {
-	case systemmember.FieldMail:
-		m.ResetMail()
-		return nil
-	case systemmember.FieldPassword:
-		m.ResetPassword()
-		return nil
-	}
-	return fmt.Errorf("unknown Systemmember field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this
-// mutation.
-func (m *SystemmemberMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.personal != nil {
-		edges = append(edges, systemmember.EdgePersonal)
-	}
-	return edges
-}
-
-// AddedIDs returns all ids (to other nodes) that were added for
-// the given edge name.
-func (m *SystemmemberMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case systemmember.EdgePersonal:
-		ids := make([]ent.Value, 0, len(m.personal))
-		for id := range m.personal {
-			ids = append(ids, id)
-		}
-		return ids
-	}
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this
-// mutation.
-func (m *SystemmemberMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.removedpersonal != nil {
-		edges = append(edges, systemmember.EdgePersonal)
-	}
-	return edges
-}
-
-// RemovedIDs returns all ids (to other nodes) that were removed for
-// the given edge name.
-func (m *SystemmemberMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case systemmember.EdgePersonal:
-		ids := make([]ent.Value, 0, len(m.removedpersonal))
-		for id := range m.removedpersonal {
-			ids = append(ids, id)
-		}
-		return ids
-	}
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this
-// mutation.
-func (m *SystemmemberMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	return edges
-}
-
-// EdgeCleared returns a boolean indicates if this edge was
-// cleared in this mutation.
-func (m *SystemmemberMutation) EdgeCleared(name string) bool {
-	switch name {
-	}
-	return false
-}
-
-// ClearEdge clears the value for the given name. It returns an
-// error if the edge name is not defined in the schema.
-func (m *SystemmemberMutation) ClearEdge(name string) error {
-	switch name {
-	}
-	return fmt.Errorf("unknown Systemmember unique edge %s", name)
-}
-
-// ResetEdge resets all changes in the mutation regarding the
-// given edge name. It returns an error if the edge is not
-// defined in the schema.
-func (m *SystemmemberMutation) ResetEdge(name string) error {
-	switch name {
-	case systemmember.EdgePersonal:
-		m.ResetPersonal()
-		return nil
-	}
-	return fmt.Errorf("unknown Systemmember edge %s", name)
 }

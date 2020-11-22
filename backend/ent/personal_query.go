@@ -12,10 +12,10 @@ import (
 	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
 	"github.com/facebookincubator/ent/schema/field"
 	"github.com/ssaatw/app/ent/department"
+	"github.com/ssaatw/app/ent/gender"
 	"github.com/ssaatw/app/ent/jobtitle"
 	"github.com/ssaatw/app/ent/personal"
 	"github.com/ssaatw/app/ent/predicate"
-	"github.com/ssaatw/app/ent/systemmember"
 )
 
 // PersonalQuery is the builder for querying Personal entities.
@@ -27,10 +27,10 @@ type PersonalQuery struct {
 	unique     []string
 	predicates []predicate.Personal
 	// eager-loading edges.
-	withJobtitle     *JobtitleQuery
-	withDepartment   *DepartmentQuery
-	withSystemmember *SystemmemberQuery
-	withFKs          bool
+	withJobtitle   *JobtitleQuery
+	withDepartment *DepartmentQuery
+	withGender     *GenderQuery
+	withFKs        bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -96,17 +96,17 @@ func (pq *PersonalQuery) QueryDepartment() *DepartmentQuery {
 	return query
 }
 
-// QuerySystemmember chains the current query on the systemmember edge.
-func (pq *PersonalQuery) QuerySystemmember() *SystemmemberQuery {
-	query := &SystemmemberQuery{config: pq.config}
+// QueryGender chains the current query on the gender edge.
+func (pq *PersonalQuery) QueryGender() *GenderQuery {
+	query := &GenderQuery{config: pq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := pq.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(personal.Table, personal.FieldID, pq.sqlQuery()),
-			sqlgraph.To(systemmember.Table, systemmember.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, personal.SystemmemberTable, personal.SystemmemberColumn),
+			sqlgraph.To(gender.Table, gender.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, personal.GenderTable, personal.GenderColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
 		return fromU, nil
@@ -315,14 +315,14 @@ func (pq *PersonalQuery) WithDepartment(opts ...func(*DepartmentQuery)) *Persona
 	return pq
 }
 
-//  WithSystemmember tells the query-builder to eager-loads the nodes that are connected to
-// the "systemmember" edge. The optional arguments used to configure the query builder of the edge.
-func (pq *PersonalQuery) WithSystemmember(opts ...func(*SystemmemberQuery)) *PersonalQuery {
-	query := &SystemmemberQuery{config: pq.config}
+//  WithGender tells the query-builder to eager-loads the nodes that are connected to
+// the "gender" edge. The optional arguments used to configure the query builder of the edge.
+func (pq *PersonalQuery) WithGender(opts ...func(*GenderQuery)) *PersonalQuery {
+	query := &GenderQuery{config: pq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	pq.withSystemmember = query
+	pq.withGender = query
 	return pq
 }
 
@@ -396,10 +396,10 @@ func (pq *PersonalQuery) sqlAll(ctx context.Context) ([]*Personal, error) {
 		loadedTypes = [3]bool{
 			pq.withJobtitle != nil,
 			pq.withDepartment != nil,
-			pq.withSystemmember != nil,
+			pq.withGender != nil,
 		}
 	)
-	if pq.withJobtitle != nil || pq.withDepartment != nil || pq.withSystemmember != nil {
+	if pq.withJobtitle != nil || pq.withDepartment != nil || pq.withGender != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -479,16 +479,16 @@ func (pq *PersonalQuery) sqlAll(ctx context.Context) ([]*Personal, error) {
 		}
 	}
 
-	if query := pq.withSystemmember; query != nil {
+	if query := pq.withGender; query != nil {
 		ids := make([]int, 0, len(nodes))
 		nodeids := make(map[int][]*Personal)
 		for i := range nodes {
-			if fk := nodes[i].systemmember_id; fk != nil {
+			if fk := nodes[i].gender_id; fk != nil {
 				ids = append(ids, *fk)
 				nodeids[*fk] = append(nodeids[*fk], nodes[i])
 			}
 		}
-		query.Where(systemmember.IDIn(ids...))
+		query.Where(gender.IDIn(ids...))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
@@ -496,10 +496,10 @@ func (pq *PersonalQuery) sqlAll(ctx context.Context) ([]*Personal, error) {
 		for _, n := range neighbors {
 			nodes, ok := nodeids[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "systemmember_id" returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "gender_id" returned %v`, n.ID)
 			}
 			for i := range nodes {
-				nodes[i].Edges.Systemmember = n
+				nodes[i].Edges.Gender = n
 			}
 		}
 	}

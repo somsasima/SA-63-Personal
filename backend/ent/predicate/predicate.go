@@ -9,11 +9,11 @@ import (
 // Department is the predicate function for department builders.
 type Department func(*sql.Selector)
 
+// Gender is the predicate function for gender builders.
+type Gender func(*sql.Selector)
+
 // Jobtitle is the predicate function for jobtitle builders.
 type Jobtitle func(*sql.Selector)
 
 // Personal is the predicate function for personal builders.
 type Personal func(*sql.Selector)
-
-// Systemmember is the predicate function for systemmember builders.
-type Systemmember func(*sql.Selector)
